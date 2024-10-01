@@ -41,7 +41,7 @@ Student.beforeCreate(async (student) => {
 // Hash password before updating a student
 Student.beforeUpdate(async (student) => {
   if (user.changed("password")) {
-    user.password = await bcrypt.hash(user.password, 10);
+    student.password = await bcrypt.hash(student.password, 10);
   }
 });
 
