@@ -12,6 +12,11 @@ import usePasswordVisibility from "../hooks/usePasswordVisibility";
 import { loginSchema } from "../schemas/fields";
 import "../styles/LoginPage.scss";
 import "../utils/changeCase";
+import { encrypt } from "../utils/encrypt";
+import { useDispatch } from "react-redux";
+import { loginSlice } from "../features/slices/authSlice";
+import { useNavigate } from "react-router-dom";
+import { TabValues } from "../schemas/pages";
 
 const usernameField = appConfig.formFields.username.toLowerCase();
 const passwordField = appConfig.formFields.password.toLowerCase();
@@ -28,6 +33,8 @@ const LoginPage = () => {
 		},
 		resolver: yupResolver(loginSchema),
 	});
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const [loginStudent] = useLoginStudentMutation();
 	const [loginAdmin] = useLoginAdminMutation();
 	const { visibility, toggleVisibility } = usePasswordVisibility();
@@ -41,7 +48,18 @@ const LoginPage = () => {
 		const { username, ...password } = data;
 		try {
 			const response = await loginStudent({ studentCode: username, ...password }).unwrap();
+			const encryptedToken = encrypt(response?.token);
+			const encryptedUser = encrypt(response?.student);
+			sessionStorage.setItem(appConfig.sessionKeys?.token, encryptedToken?.encrypted);
+			sessionStorage.setItem(appConfig?.sessionKeys?.user, encryptedUser?.encrypted);
 			toast.success(response.message);
+			dispatch(
+				loginSlice({
+					token: response?.token,
+					user: response?.student,
+				})
+			);
+			navigate(`${TabValues?.requests?.to}`);
 		} catch (error) {
 			toast.error(error?.data?.message);
 		}

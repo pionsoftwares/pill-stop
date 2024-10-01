@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { decrypt } from "../../utils/encrypt";
+import appConfig from "../../config";
 
-const { decryptedData: decryptedToken } = decrypt(sessionStorage.getItem("TOKEN"));
-const { decryptedData: userData } = decrypt(sessionStorage.getItem("user"));
+const { decryptedData: decryptedToken } = decrypt(sessionStorage.getItem(appConfig?.sessionKeys?.token));
+const { decryptedData: userData } = decrypt(sessionStorage.getItem(appConfig.sessionKeys?.user));
 const authSlice = createSlice({
 	name: "auth",
 	initialState: {

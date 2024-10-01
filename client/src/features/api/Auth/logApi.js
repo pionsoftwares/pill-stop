@@ -1,7 +1,7 @@
 import { api } from "..";
 import appConfig from "../../../config";
 
-const logApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEndpoints({
+const logApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.user] }).injectEndpoints({
 	endpoints: (builder) => ({
 		loginStudent: builder.mutation({
 			query: (body) => ({

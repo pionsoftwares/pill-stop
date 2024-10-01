@@ -32,6 +32,10 @@ const appConfig = {
 		studentLogin: "/login/student",
 		adminLogin: "/login/admin",
 	},
+	sessionKeys: {
+		token: "TOKEN",
+		user: "USER",
+	},
 	navItems: {
 		// home: createTabItem("Home", <HomeOutlined />, <HomeRounded />),
 		requests: createTabItem("Requests", <AddCircleOutline />, <AddCircleRounded />),
