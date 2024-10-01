@@ -22,6 +22,10 @@ const appConfig = {
 		delete: "Delete",
 		login: "Sign In",
 	},
+	formFields: {
+		username: "Username",
+		password: "Password",
+	},
 	userRoles: ["Admin", "User", "Guest"],
 	// apiEndpoints: {
 	// 	getUser: "/api/user",

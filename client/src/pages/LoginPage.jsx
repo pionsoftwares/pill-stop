@@ -1,16 +1,40 @@
-import { AccountCircleOutlined, VpnKeyOutlined } from "@mui/icons-material";
-import { Box, Button, Card, InputAdornment, Slide, TextField, Typography } from "@mui/material";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { AccountCircleOutlined, VisibilityOffOutlined, VisibilityOutlined, VpnKeyOutlined } from "@mui/icons-material";
+import { Box, Button, Card, IconButton, InputAdornment, Slide, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import logo from "../assets/Logo.svg";
 import LandingSlide from "../components/LandingSlide";
 import appConfig from "../config.jsX";
+import { loginSchema } from "../schemas/fields";
 import "../styles/LoginPage.scss";
 import "../utils/changeCase";
+import usePasswordVisibility from "../hooks/usePasswordVisibility";
+
+const usernameField = appConfig.formFields.username.toLowerCase();
+const passwordField = appConfig.formFields.password.toLowerCase();
+
 const LoginPage = () => {
+	const {
+		handleSubmit,
+		register,
+		formState: { errors },
+	} = useForm({
+		defaultValues: {
+			[usernameField]: "", // Use dynamic default value for username
+			[passwordField]: "", // Use dynamic default value for password
+		},
+		resolver: yupResolver(loginSchema),
+	});
+	const { visibility, toggleVisibility } = usePasswordVisibility();
 	const [showLogin, setShowLogin] = useState(false);
 
 	const handleLandingSlideComplete = () => {
 		setShowLogin(true);
+	};
+
+	const submitHandler = (data) => {
+		console.log("data", data);
 	};
 
 	return (
@@ -35,9 +59,13 @@ const LoginPage = () => {
 						</Typography>
 						<Typography variant="caption">{appConfig?.captions?.signIn}</Typography>
 					</Box>
+
 					<TextField
-						label="Username"
+						{...register(usernameField)}
+						label={usernameField.toCapitalCase()}
 						fullWidth
+						error={!!errors[usernameField]}
+						helperText={errors?.[usernameField] ? errors?.[usernameField]?.message : " "}
 						variant="standard"
 						slotProps={{
 							input: {
@@ -50,11 +78,22 @@ const LoginPage = () => {
 						}}
 					/>
 					<TextField
-						label="Password"
+						{...register(passwordField)}
+						label={passwordField.toCapitalCase()}
+						type={visibility[passwordField] ? "text" : "password"}
+						error={!!errors[passwordField]}
+						helperText={errors?.[passwordField] ? errors?.[passwordField]?.message : " "}
 						fullWidth
 						variant="standard"
 						slotProps={{
 							input: {
+								endAdornment: (
+									<InputAdornment position="start">
+										<IconButton onClick={() => toggleVisibility(passwordField)}>
+											{visibility.password ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
+										</IconButton>
+									</InputAdornment>
+								),
 								startAdornment: (
 									<InputAdornment position="start">
 										<VpnKeyOutlined />
@@ -63,7 +102,10 @@ const LoginPage = () => {
 							},
 						}}
 					/>
-					<Button variant="contained">{appConfig?.buttonLabels.login}</Button>
+
+					<Button variant="contained" type="submit" onClick={handleSubmit(submitHandler)}>
+						{appConfig?.buttonLabels.login}
+					</Button>
 				</Card>
 			</Slide>
 		</Box>

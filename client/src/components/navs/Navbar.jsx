@@ -1,6 +1,6 @@
 import { Paper, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import appConfig from "../../config.jsX";
+import appConfig from "../../config.jsx";
 import "../../styles/Navbar.scss"; // Import your SCSS file
 const Navbar = () => {
 	const [scrolling, setScrolling] = useState(false); // State to track if scrolling
