@@ -51,4 +51,19 @@ const studentSchemas = {
   }),
 };
 
-module.exports = { authSchemas, studentSchemas };
+const medicineRequestSchemas = {
+  requestMedicine: yup.object().shape({
+    body: yup.object().shape({
+      medicineName: yup
+        .string()
+        .required("Medicine name is required")
+        .typeError("Medicine name should be a string"),
+      symptoms: yup
+        .string()
+        .required("Symptoms is required")
+        .typeError("Symptoms should be a string"),
+    }),
+  }),
+};
+
+module.exports = { authSchemas, studentSchemas, medicineRequestSchemas };

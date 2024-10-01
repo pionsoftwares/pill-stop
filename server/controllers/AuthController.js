@@ -33,8 +33,10 @@ const AuthController = {
       // Create a JWT token for the student
       const token = jwt.sign(
         {
-          studentId: student.id,
-          studentCode: student.studentCode,
+          student: {
+            id: student.id,
+            studentCode: student.studentCode,
+          },
         },
         process.env.JWT_SECRET
       );

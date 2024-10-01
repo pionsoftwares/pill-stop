@@ -20,6 +20,13 @@ const StudentController = {
         allergies,
       } = req.body;
 
+      // If the user is not an admin, throw an error
+      if (!req.admin) {
+        const error = new Error("Only admins can create students");
+        error.statusCode = 401;
+        throw error;
+      }
+
       // Check if the student code already exists
       const studentCodeExists = await Student.findOne({
         where: { studentCode },
