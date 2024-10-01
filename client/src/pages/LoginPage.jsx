@@ -38,8 +38,9 @@ const LoginPage = () => {
 	};
 
 	const submitHandler = async (data) => {
+		const { username, ...password } = data;
 		try {
-			const response = await loginStudent(data).unwrap();
+			const response = await loginStudent({ studentCode: username, ...password }).unwrap();
 			toast.success(response.message);
 		} catch (error) {
 			toast.error(error?.data?.message);

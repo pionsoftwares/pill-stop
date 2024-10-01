@@ -27,11 +27,11 @@ const appConfig = {
 		password: "Password",
 	},
 	userRoles: ["Admin", "User", "Guest"],
-	// apiEndpoints: {
-	// 	getUser: "/api/user",
-	// 	saveUser: "/api/user/save",
-	// 	deleteUser: "/api/user/delete",
-	// },
+	apiEndpoints: {
+		index: "/api",
+		studentLogin: "/login/student",
+		adminLogin: "/login/admin",
+	},
 	navItems: {
 		// home: createTabItem("Home", <HomeOutlined />, <HomeRounded />),
 		requests: createTabItem("Requests", <AddCircleOutline />, <AddCircleRounded />),
