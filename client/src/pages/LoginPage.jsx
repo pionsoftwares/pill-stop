@@ -3,13 +3,15 @@ import { AccountCircleOutlined, VisibilityOffOutlined, VisibilityOutlined, VpnKe
 import { Box, Button, Card, IconButton, InputAdornment, Slide, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import logo from "../assets/Logo.svg";
 import LandingSlide from "../components/LandingSlide";
 import appConfig from "../config.jsX";
+import { useLoginAdminMutation, useLoginStudentMutation } from "../features/api/Auth/logApi";
+import usePasswordVisibility from "../hooks/usePasswordVisibility";
 import { loginSchema } from "../schemas/fields";
 import "../styles/LoginPage.scss";
 import "../utils/changeCase";
-import usePasswordVisibility from "../hooks/usePasswordVisibility";
 
 const usernameField = appConfig.formFields.username.toLowerCase();
 const passwordField = appConfig.formFields.password.toLowerCase();
@@ -26,6 +28,8 @@ const LoginPage = () => {
 		},
 		resolver: yupResolver(loginSchema),
 	});
+	const [loginStudent] = useLoginStudentMutation();
+	const [loginAdmin] = useLoginAdminMutation();
 	const { visibility, toggleVisibility } = usePasswordVisibility();
 	const [showLogin, setShowLogin] = useState(false);
 
@@ -33,8 +37,13 @@ const LoginPage = () => {
 		setShowLogin(true);
 	};
 
-	const submitHandler = (data) => {
-		console.log("data", data);
+	const submitHandler = async (data) => {
+		try {
+			const response = await loginStudent(data).unwrap();
+			toast.success(response.message);
+		} catch (error) {
+			toast.error(error?.data?.message);
+		}
 	};
 
 	return (

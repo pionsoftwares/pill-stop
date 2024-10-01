@@ -1,15 +1,22 @@
-import { api } from '..'
+import { api } from "..";
 
-const logApi = api.enhanceEndpoints({ addTagTypes: ['User'] }).injectEndpoints({
-  endpoints: (builder) => ({
-    login: builder.mutation({
-      query: (body) => ({
-        url: '/login',
-        method: 'POST',
-        body
-      })
-    })
-  })
-})
+const logApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEndpoints({
+	endpoints: (builder) => ({
+		loginStudent: builder.mutation({
+			query: (body) => ({
+				url: "/login",
+				method: "POST",
+				body,
+			}),
+		}),
+		loginAdmin: builder.mutation({
+			query: (body) => ({
+				url: "/login",
+				method: "POST",
+				body,
+			}),
+		}),
+	}),
+});
 
-export const { useLoginMutation } = logApi
+export const { useLoginStudentMutation, useLoginAdminMutation } = logApi;
