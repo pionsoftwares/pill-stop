@@ -1,0 +1,17 @@
+{
+  "name": "pill-stop-server",
+  "version": "1.0.0",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Backend for Pill Stop Web App",
+  "dependencies": {
+    "express": "^4.21.0",
+    "sequelize": "^6.37.3"
+  }
+}
