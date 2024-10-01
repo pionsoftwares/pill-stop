@@ -16,7 +16,7 @@ const authSchemas = {
 };
 
 const studentSchemas = {
-  createStudent: yup.object().shape({
+  mutateStudent: yup.object().shape({
     body: yup.object().shape({
       firstName: yup
         .string()
