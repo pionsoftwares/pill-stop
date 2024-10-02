@@ -106,6 +106,9 @@ const StudentController = {
         birthday,
         medicalHistory,
         allergies,
+        emergencyContactName,
+        emergencyContactNumber,
+        relationship,
       } = req.body;
 
       // Check if the student exists
@@ -157,13 +160,25 @@ const StudentController = {
         { transaction }
       );
 
+      // Update the EmergencyContact
+      const emergencyContact = await EmergencyContact.findOne({
+        where: { studentId: id },
+      });
+
+      await emergencyContact.update(
+        {
+          emergencyContactName,
+          emergencyContactNumber,
+          relationship,
+        },
+        { relationship }
+      );
+
       // Commit the transaction
       await transaction.commit();
 
       // Send the response
-      res
-        .status(200)
-        .json({ message: "Student updated successfully", student });
+      res.json({ message: "Student updated successfully", student });
     } catch (error) {
       await transaction.rollback();
       next(error);

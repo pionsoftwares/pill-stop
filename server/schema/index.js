@@ -15,6 +15,21 @@ const authSchemas = {
   }),
 };
 
+const adminSchemas = {
+  mutateAdmin: yup.object().shape({
+    body: yup.object().shape({
+      username: yup
+        .string()
+        .required("Username is required")
+        .typeError("Username should be a string"),
+      password: yup
+        .string()
+        .required("Password is required")
+        .typeError("Password should be a string"),
+    }),
+  }),
+};
+
 const studentSchemas = {
   mutateStudent: yup.object().shape({
     body: yup.object().shape({
@@ -73,4 +88,9 @@ const medicineRequestSchemas = {
   }),
 };
 
-module.exports = { authSchemas, studentSchemas, medicineRequestSchemas };
+module.exports = {
+  authSchemas,
+  adminSchemas,
+  studentSchemas,
+  medicineRequestSchemas,
+};

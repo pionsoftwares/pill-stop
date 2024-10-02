@@ -9,6 +9,19 @@ const hashPassword = async (password) => {
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
+      "Admins",
+      [
+        {
+          username: "docwillyong",
+          password: await hashPassword("1234"),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      {}
+    );
+
+    await queryInterface.bulkInsert(
       "Students",
       [
         {
@@ -28,6 +41,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete("Admins", null, {});
     await queryInterface.bulkDelete("Students", null, {});
   },
 };
