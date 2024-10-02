@@ -144,12 +144,12 @@ const LoginPage = () => {
 					/>
 
 					<Button variant="contained" type="submit" onClick={handleSubmit(submitHandler)}>
-						{isStudentLogin ? appConfig?.buttonLabels.login : "Admin Login"}
+						{isStudentLogin ? appConfig.buttonLabels.login : appConfig.buttonLabels.adminLogin}
 					</Button>
 					<Typography variant="body2" className="login-page__change-user">
-						{isStudentLogin ? "Not a student?" : "Not an admin?"}{" "}
+						{isStudentLogin ? appConfig.captions.notAStudent : appConfig.captions.notAnAdmin}{" "}
 						<span className="login-page__change-user--link" onClick={toggleLoginType}>
-							{isStudentLogin ? "Admin Login" : "Student Login"}
+							{isStudentLogin ? appConfig.buttonLabels.adminLogin : appConfig.buttonLabels.login}
 						</span>
 					</Typography>
 				</Card>

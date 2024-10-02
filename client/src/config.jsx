@@ -15,12 +15,15 @@ const appConfig = {
 	captions: {
 		tagLine: "Your medicine, anytime.",
 		signIn: "Please sign in to continue.",
+		notAStudent: "Not a student?",
+		notAnAdmin: "Not an admin?",
 	},
 	buttonLabels: {
 		save: "Save",
 		cancel: "Cancel",
 		delete: "Delete",
 		login: "Sign In",
+		adminLogin: "Admin Login", // New label for Admin Login
 	},
 	formFields: {
 		username: "Username",
@@ -37,7 +40,6 @@ const appConfig = {
 		user: "USER",
 	},
 	navItems: {
-		// home: createTabItem("Home", <HomeOutlined />, <HomeRounded />),
 		requests: createTabItem("Requests", <AddCircleOutline />, <AddCircleRounded />),
 		home: createTabItem("History", <AccessTimeOutlined />, <AccessTimeFilledRounded />),
 		account: createTabItem("Account", <AccountCircleOutlined />, <AccountCircleRounded />),
