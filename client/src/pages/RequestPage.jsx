@@ -1,9 +1,9 @@
 import { Box, TextField, InputAdornment } from "@mui/material";
 import SearchRounded from "@mui/icons-material/SearchRounded";
-
-const YourComponent = () => {
+import "../styles/RequestPage.scss";
+const RequestPage = () => {
 	return (
-		<Box>
+		<Box className="request-page">
 			<Box className="symptoms" sx={{ backgroundColor: (theme) => theme.palette.primary.main, padding: "2rem" }}>
 				<TextField
 					label="How are you feeling?"
@@ -34,8 +34,9 @@ const YourComponent = () => {
 					}}
 				/>
 			</Box>
+			<Box className="content">sample</Box>
 		</Box>
 	);
 };
 
-export default YourComponent;
+export default RequestPage;

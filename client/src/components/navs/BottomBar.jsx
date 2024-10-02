@@ -15,7 +15,7 @@ const BottomBar = () => {
 		}) || "home";
 
 	return (
-		<Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }} elevation={3}>
+		<Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 40, height: "50px" }} elevation={3}>
 			<BottomNavigation value={value}>
 				{Object.entries(TabValues)?.map(([key, item]) => {
 					// Determine which icon to use based on active state

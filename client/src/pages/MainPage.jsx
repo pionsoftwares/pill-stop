@@ -9,7 +9,7 @@ const MainPage = () => {
 	return (
 		<Box className="main-page">
 			<Navbar />
-			<Box sx={{ py: 7 }}>
+			<Box className="main-page__outlet" sx={{ py: 7 }}>
 				<Outlet />
 			</Box>
 			<BottomBar />

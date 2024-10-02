@@ -6,7 +6,8 @@ import MainPage from "../pages/MainPage";
 import PrivateRoutes from "../pages/PrivateRoutes";
 import HomePage from "../pages/HomePage";
 import RequestPage from "../pages/RequestPage";
-import appConfig from "../config.jsX";
+import appConfig from "../config.jsx";
+import AccountPage from "../pages/AccountPage.jsx";
 
 export const router = createBrowserRouter([
 	{
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
 					{
 						path: appConfig?.navItems?.requests?.to,
 						element: <RequestPage />,
+					},
+					{
+						path: appConfig?.navItems?.account?.to,
+						element: <AccountPage />,
 					},
 					// {
 					// 	path: "inventory",
