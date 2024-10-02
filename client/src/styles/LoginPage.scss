@@ -52,4 +52,11 @@
 			gap: 2rem; // Larger gap
 		}
 	}
+	&__change-user {
+		align-self: center;
+		&--link {
+			color: $primary-main;
+			font-weight: 550;
+		}
+	}
 }

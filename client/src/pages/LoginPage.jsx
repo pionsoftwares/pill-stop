@@ -39,6 +39,7 @@ const LoginPage = () => {
 	const [loginAdmin] = useLoginAdminMutation();
 	const { visibility, toggleVisibility } = usePasswordVisibility();
 	const [showLogin, setShowLogin] = useState(false);
+	const [isStudentLogin, setIsStudentLogin] = useState(true); // State to toggle between student and admin login
 
 	const handleLandingSlideComplete = () => {
 		setShowLogin(true);
@@ -47,22 +48,32 @@ const LoginPage = () => {
 	const submitHandler = async (data) => {
 		const { username, ...password } = data;
 		try {
-			const response = await loginStudent({ studentCode: username, ...password }).unwrap();
+			const response = isStudentLogin
+				? await loginStudent({ studentCode: username, ...password }).unwrap()
+				: await loginAdmin({ adminCode: username, ...password }).unwrap(); // Admin login mutation
 			const encryptedToken = encrypt(response?.token);
-			const encryptedUser = encrypt(response?.student);
+			const encryptedUser = encrypt(isStudentLogin ? response?.student : response?.admin);
 			sessionStorage.setItem(appConfig.sessionKeys?.token, encryptedToken?.encrypted);
 			sessionStorage.setItem(appConfig?.sessionKeys?.user, encryptedUser?.encrypted);
 			toast.success(response.message);
 			dispatch(
 				loginSlice({
 					token: response?.token,
-					user: response?.student,
+					user: isStudentLogin ? response?.student : response?.admin,
 				})
 			);
 			navigate(`${TabValues?.requests?.to}`);
 		} catch (error) {
 			toast.error(error?.data?.message);
 		}
+	};
+
+	const toggleLoginType = () => {
+		setShowLogin(false); // Trigger slide out
+		setTimeout(() => {
+			setIsStudentLogin(!isStudentLogin); // Switch form
+			setShowLogin(true); // Trigger slide in after a short delay
+		}, 300); // Short delay to allow the slide-out animation to complete
 	};
 
 	return (
@@ -79,13 +90,14 @@ const LoginPage = () => {
 				</Typography>
 			</Box>
 			<Slide in={showLogin} direction="up">
-				{/* Shortened timeout for smoother transitions */}
 				<Card className="login-page__login-form">
 					<Box>
 						<Typography variant="h4" fontWeight={"bold"} color="primary">
-							{appConfig?.buttonLabels?.login}
+							{isStudentLogin ? appConfig?.buttonLabels?.login : "Admin Login"}
 						</Typography>
-						<Typography variant="caption">{appConfig?.captions?.signIn}</Typography>
+						<Typography variant="caption">
+							{isStudentLogin ? appConfig?.captions?.signIn : "Sign in as Admin"}
+						</Typography>
 					</Box>
 
 					<TextField
@@ -132,8 +144,14 @@ const LoginPage = () => {
 					/>
 
 					<Button variant="contained" type="submit" onClick={handleSubmit(submitHandler)}>
-						{appConfig?.buttonLabels.login}
+						{isStudentLogin ? appConfig?.buttonLabels.login : "Admin Login"}
 					</Button>
+					<Typography variant="body2" className="login-page__change-user">
+						{isStudentLogin ? "Not a student?" : "Not an admin?"}{" "}
+						<span className="login-page__change-user--link" onClick={toggleLoginType}>
+							{isStudentLogin ? "Admin Login" : "Student Login"}
+						</span>
+					</Typography>
 				</Card>
 			</Slide>
 		</Box>
