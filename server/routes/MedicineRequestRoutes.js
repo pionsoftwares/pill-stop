@@ -12,7 +12,17 @@ router.post(
 );
 router.get(
   "/medicine-requests",
-  MedicineRequestController.getAllMedicineRequets
+  MedicineRequestController.getAllMedicineRequests
+);
+router.put(
+  "/approve/medicine-requests/:medicineRequestId",
+  validateSchema(medicineRequestSchemas.approveMedicineRequest),
+  MedicineRequestController.approveMedicineRequest
+);
+router.put(
+  "/reject/medicine-requests/:medicineRequestId",
+  validateSchema(medicineRequestSchemas.rejectMedicineRequest),
+  MedicineRequestController.rejectMedicineRequest
 );
 
 module.exports = router;

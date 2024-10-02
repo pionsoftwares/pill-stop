@@ -98,6 +98,28 @@ const medicineRequestSchemas = {
         .typeError("Symptoms should be a string"),
     }),
   }),
+  approveMedicineRequest: yup.object().shape({
+    params: yup.object().shape({
+      medicineRequestId: yup
+        .string()
+        .required("Request ID is required")
+        .typeError("Request ID should be a string"),
+    }),
+  }),
+  rejectMedicineRequest: yup.object().shape({
+    params: yup.object().shape({
+      medicineRequestId: yup
+        .string()
+        .required("Request ID is required")
+        .typeError("Request ID should be a string"),
+    }),
+    body: yup.object().shape({
+      reason: yup
+        .string()
+        .required("Reason is required")
+        .typeError("Reason should be a string"),
+    }),
+  }),
 };
 
 module.exports = {

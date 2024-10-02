@@ -8,10 +8,16 @@ const authRoutes = require("./AuthRoutes");
 const adminRoutes = require("./AdminRoutes");
 const studentRoutes = require("./StudentRoutes");
 const medicineRequestRoutes = require("./MedicineRequestRoutes");
+const medicineRoutes = require("./MedicineRoutes");
 
 const publicRoutes = [authRoutes];
 
-const privateRoutes = [adminRoutes, studentRoutes, medicineRequestRoutes];
+const privateRoutes = [
+  adminRoutes,
+  studentRoutes,
+  medicineRequestRoutes,
+  medicineRoutes,
+];
 
 publicRoutes.forEach((route) => {
   router.use("/api", route, errorHandler);

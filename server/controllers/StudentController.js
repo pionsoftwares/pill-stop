@@ -236,7 +236,7 @@ const StudentController = {
       }
 
       // Update the Student
-      await Student.update(
+      await student.update(
         {
           firstName,
           middleName,
