@@ -10,8 +10,8 @@ export default defineConfig({
 				api: "modern-compiler", // or "modern"
 			},
 		},
-		server: {
-			port: 5177,
-		},
+	},
+	server: {
+		port: 5177,
 	},
 });
