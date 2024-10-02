@@ -10,6 +10,9 @@ router.post(
   validateSchema(studentSchemas.mutateStudent),
   StudentController.createStudent
 );
+router.get("/student", StudentController.getAllStudents);
+router.get("/student/:id", StudentController.getStudentById);
+router.get("/current/student", StudentController.getCurrentStudent);
 router.put(
   "/student/:id",
   validateSchema(studentSchemas.mutateStudent),

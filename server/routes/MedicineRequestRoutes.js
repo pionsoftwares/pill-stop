@@ -10,5 +10,9 @@ router.post(
   validateSchema(medicineRequestSchemas.requestMedicine),
   MedicineRequestController.requestMedicine
 );
+router.get(
+  "/medicine-requests",
+  MedicineRequestController.getAllMedicineRequets
+);
 
 module.exports = router;

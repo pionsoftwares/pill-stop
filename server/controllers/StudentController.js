@@ -58,7 +58,7 @@ const StudentController = {
       );
 
       // Create a new MedicalRecord
-      await MedicalRecord.create(
+      const medicalRecord = await MedicalRecord.create(
         {
           medicalHistory,
           allergies,
@@ -68,7 +68,7 @@ const StudentController = {
       );
 
       // Create a new EmergencyContact
-      await EmergencyContact.create(
+      const emergencyContact = await EmergencyContact.create(
         {
           emergencyContactName,
           emergencyContactNumber,
@@ -82,11 +82,113 @@ const StudentController = {
       await transaction.commit();
 
       // Send the response
-      res
-        .status(201)
-        .json({ message: "Student created successfully", student });
+      res.status(201).json({
+        message: "Student created successfully",
+        student: { ...student.dataValues, medicalRecord, emergencyContact },
+      });
     } catch (error) {
       await transaction.rollback();
+      next(error);
+    }
+  },
+
+  getAllStudents: async (req, res, next) => {
+    try {
+      // If the user requesting is a student, throw an error
+      if (req.student) {
+        const error = new Error("Only admins can view all students");
+        error.statusCode = 401;
+        throw error;
+      }
+
+      // Get all students
+      const students = await Student.findAll({
+        attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+        include: [
+          {
+            model: MedicalRecord,
+            as: "medicalRecord",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+          {
+            model: EmergencyContact,
+            as: "emergencyContact",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+      });
+
+      // Send the response
+      res.json({ students });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getStudentById: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      // Get the student by id
+      const student = await Student.findByPk(id, {
+        attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+        include: [
+          {
+            model: MedicalRecord,
+            as: "medicalRecord",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+          {
+            model: EmergencyContact,
+            as: "emergencyContact",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+      });
+
+      // If the student does not exist, throw an error
+      if (!student) {
+        const error = new Error("Student not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Send the response
+      res.json({ student });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getCurrentStudent: async (req, res, next) => {
+    try {
+      // If the student does not exist, throw an error
+      if (!req.student) {
+        const error = new Error("Only students can view their profile");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Get the student by id
+      const student = await Student.findByPk(req.student.id, {
+        attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+        include: [
+          {
+            model: MedicalRecord,
+            as: "medicalRecord",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+          {
+            model: EmergencyContact,
+            as: "emergencyContact",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+      });
+
+      // Send the response
+      res.json({ student });
+    } catch (error) {
       next(error);
     }
   },
@@ -134,7 +236,7 @@ const StudentController = {
       }
 
       // Update the Student
-      await student.update(
+      await Student.update(
         {
           firstName,
           middleName,

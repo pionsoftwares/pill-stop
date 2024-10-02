@@ -13,6 +13,18 @@ const authSchemas = {
         .typeError("Password should be a string"),
     }),
   }),
+  loginAdmin: yup.object().shape({
+    body: yup.object().shape({
+      username: yup
+        .string()
+        .required("Username is required")
+        .typeError("Username should be a string"),
+      password: yup
+        .string()
+        .required("Password is required")
+        .typeError("Password should be a string"),
+    }),
+  }),
 };
 
 const adminSchemas = {

@@ -10,5 +10,10 @@ router.post(
   validateSchema(authSchemas.loginStudent),
   AuthController.loginStudent
 );
+router.post(
+  "/login/admin",
+  validateSchema(authSchemas.loginAdmin),
+  AuthController.loginAdmin
+);
 
 module.exports = router;
