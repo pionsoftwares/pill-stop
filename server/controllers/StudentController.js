@@ -1,7 +1,8 @@
 const db = require("../config/db");
+const Sequelize = require("sequelize");
 const Student = require("../models/StudentModel");
 const MedicalRecord = require("../models/MedicalRecordModel");
-const Sequelize = require("sequelize");
+const EmergencyContact = require("../models/EmergencyContactModel");
 
 const StudentController = {
   createStudent: async (req, res, next) => {
@@ -18,6 +19,9 @@ const StudentController = {
         birthday,
         medicalHistory,
         allergies,
+        emergencyContactName,
+        emergencyContactNumber,
+        relationship,
       } = req.body;
 
       // If the user is not an admin, throw an error
@@ -58,6 +62,17 @@ const StudentController = {
         {
           medicalHistory,
           allergies,
+          studentId: student.id,
+        },
+        { transaction }
+      );
+
+      // Create a new EmergencyContact
+      await EmergencyContact.create(
+        {
+          emergencyContactName,
+          emergencyContactNumber,
+          relationship,
           studentId: student.id,
         },
         { transaction }

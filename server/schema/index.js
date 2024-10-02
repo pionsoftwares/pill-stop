@@ -47,6 +47,13 @@ const studentSchemas = {
         .string()
         .typeError("Medical history should be a string"),
       allergies: yup.string().typeError("Allergies should be a string"),
+      emergencyContactName: yup
+        .string()
+        .typeError("Emergency contact name should be a string"),
+      emergencyContactNumber: yup
+        .string()
+        .typeError("Emergency contact number should be a string"),
+      relationship: yup.string().typeError("Relationship should be a string"),
     }),
   }),
 };
