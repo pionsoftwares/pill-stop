@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AccountCircleOutlined, VisibilityOffOutlined, VisibilityOutlined, VpnKeyOutlined } from "@mui/icons-material";
 import { Box, Button, Card, IconButton, InputAdornment, Slide, TextField, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import logo from "../assets/Logo.svg";
@@ -13,7 +13,7 @@ import { loginSchema } from "../schemas/fields";
 import "../styles/LoginPage.scss";
 import "../utils/changeCase";
 import { encrypt } from "../utils/encrypt";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSlice } from "../features/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { TabValues } from "../schemas/pages";
@@ -40,7 +40,7 @@ const LoginPage = () => {
 	const { visibility, toggleVisibility } = usePasswordVisibility();
 	const [showLogin, setShowLogin] = useState(false);
 	const [isStudentLogin, setIsStudentLogin] = useState(true); // State to toggle between student and admin login
-
+	const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 	const handleLandingSlideComplete = () => {
 		setShowLogin(true);
 	};
@@ -75,7 +75,11 @@ const LoginPage = () => {
 			setShowLogin(true); // Trigger slide in after a short delay
 		}, 300); // Short delay to allow the slide-out animation to complete
 	};
-
+	useEffect(() => {
+		if (isAuthenticated) {
+			return navigate(`/`);
+		}
+	}, [isAuthenticated]);
 	return (
 		<Box className="login-page" sx={{ backgroundColor: "primary.main" }}>
 			<LandingSlide onComplete={handleLandingSlideComplete} />

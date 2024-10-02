@@ -26,12 +26,14 @@
 	}
 
 	&__form {
+		position: relative;
+
 		&.MuiPaper-root {
-			position: absolute;
-			height: 70%;
+			position: fixed;
+			height: 80%;
 			overflow: hidden;
 			width: 100%;
-			padding: 1rem;
+			padding: 2rem 1rem;
 			bottom: 0;
 			left: 0;
 			z-index: 89;

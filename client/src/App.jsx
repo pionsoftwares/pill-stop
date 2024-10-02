@@ -6,13 +6,16 @@ import ProvidesTheme from "./theme/ProvidesTheme";
 import { Provider } from "react-redux";
 import store from "./app/store";
 import { Toaster } from "sonner";
+import ConfirmProvider from "./context/ConfirmContext";
 function App() {
 	return (
 		<Provider store={store}>
 			<Toaster richColors closeButton position="top-center" visibleToasts={1} expand={false} />
 			<Box className="app">
 				<ProvidesTheme>
-					<RouterProvider router={router}></RouterProvider>
+					<ConfirmProvider>
+						<RouterProvider router={router}></RouterProvider>
+					</ConfirmProvider>
 				</ProvidesTheme>
 			</Box>
 		</Provider>

@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 
-import NotFound from "../pages/NotFound";
-import MainPage from "../pages/MainPage";
-import PrivateRoutes from "../pages/PrivateRoutes";
-import HomePage from "../pages/HomePage";
-import RequestPage from "../pages/RequestPage";
 import appConfig from "../config.jsx";
 import AccountPage from "../pages/AccountPage.jsx";
+import HistoryPage from "../pages/HistoryPage.jsx";
+import MainPage from "../pages/MainPage";
+import NotFound from "../pages/NotFound";
+import PrivateRoutes from "../pages/PrivateRoutes";
+import RequestPage from "../pages/RequestPage";
 
 export const router = createBrowserRouter([
 	{
@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
 				children: [
 					{
 						path: appConfig?.navItems?.home?.to,
-						element: <HomePage />,
+						element: <HistoryPage />,
 					},
 					{
 						path: appConfig?.navItems?.requests?.to,
