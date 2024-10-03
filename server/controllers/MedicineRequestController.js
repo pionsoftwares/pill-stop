@@ -5,6 +5,8 @@ const Approval = require("../models/ApprovalModel");
 const Rejection = require("../models/RejectionModel");
 const MedicineCode = require("../models/MedicineCodeModel");
 const Student = require("../models/StudentModel");
+const MedicalRecord = require("../models/MedicalRecordModel");
+const EmergencyContact = require("../models/EmergencyContactModel");
 const { groupBy } = require("../utils/utils");
 
 const MedicineRequestController = {
@@ -89,12 +91,19 @@ const MedicineRequestController = {
             {
               model: Approval,
               as: "approval",
-              attributes: ["id"],
+              attributes: [["createdAt", "approvedAt"]],
+              include: [
+                {
+                  model: MedicineCode,
+                  as: "medicineCode",
+                  attributes: ["code"],
+                },
+              ],
             },
             {
               model: Rejection,
               as: "rejection",
-              attributes: ["id", "reason"],
+              attributes: ["reason"],
             },
           ],
           order: [["createdAt", "DESC"]],
@@ -117,12 +126,19 @@ const MedicineRequestController = {
             {
               model: Approval,
               as: "approval",
-              attributes: ["id"],
+              attributes: [["createdAt", "approvedAt"]],
+              include: [
+                {
+                  model: MedicineCode,
+                  as: "medicineCode",
+                  attributes: ["code"],
+                },
+              ],
             },
             {
               model: Rejection,
               as: "rejection",
-              attributes: ["id", "reason"],
+              attributes: ["reason"],
             },
           ],
           order: [["createdAt", "DESC"]],
@@ -132,6 +148,66 @@ const MedicineRequestController = {
 
         res.json({ medicineRequests: groupedMedicineRequests });
       }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getAllMedicineRequestsUnfiltered: async (req, res, next) => {
+    try {
+      // If the user requesting is not an admin, throw an error
+      if (!req.admin) {
+        const error = new Error("Only admins can view all medicine requests");
+        error.statusCode = 401;
+        throw error;
+      }
+
+      const medicineRequests = await MedicineRequest.findAll({
+        attributes: ["id", "medicineName", "symptoms", "status"],
+        include: [
+          {
+            model: Student,
+            as: "student",
+            attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+            include: [
+              {
+                model: MedicalRecord,
+                as: "medicalRecord",
+                attributes: ["medicalHistory", "allergies"],
+              },
+              {
+                model: EmergencyContact,
+                as: "emergencyContact",
+                attributes: [
+                  "emergencyContactName",
+                  "relationship",
+                  "emergencyContactNumber",
+                ],
+              },
+            ],
+          },
+          {
+            model: Approval,
+            as: "approval",
+            attributes: [["createdAt", "approvedAt"]],
+            include: [
+              {
+                model: MedicineCode,
+                as: "medicineCode",
+                attributes: ["code"],
+              },
+            ],
+          },
+          {
+            model: Rejection,
+            as: "rejection",
+            attributes: ["reason"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      res.json({ medicineRequests });
     } catch (error) {
       next(error);
     }

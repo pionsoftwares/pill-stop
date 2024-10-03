@@ -14,6 +14,10 @@ router.get(
   "/medicine-requests",
   MedicineRequestController.getAllMedicineRequests
 );
+router.get(
+  "/medicine-requests/unfiltered",
+  MedicineRequestController.getAllMedicineRequestsUnfiltered
+);
 router.put(
   "/approve/medicine-requests/:medicineRequestId",
   validateSchema(medicineRequestSchemas.approveMedicineRequest),

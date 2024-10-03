@@ -108,12 +108,16 @@ const StudentController = {
           {
             model: MedicalRecord,
             as: "medicalRecord",
-            attributes: { exclude: ["createdAt", "updatedAt"] },
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "id", "studentId"],
+            },
           },
           {
             model: EmergencyContact,
             as: "emergencyContact",
-            attributes: { exclude: ["createdAt", "updatedAt"] },
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "id", "studentId"],
+            },
           },
         ],
       });
