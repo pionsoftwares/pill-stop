@@ -50,7 +50,7 @@ const LoginPage = () => {
 		try {
 			const response = isStudentLogin
 				? await loginStudent({ studentCode: username, ...password }).unwrap()
-				: await loginAdmin({ adminCode: username, ...password }).unwrap(); // Admin login mutation
+				: await loginAdmin(data).unwrap(); // Admin login mutation
 			const encryptedToken = encrypt(response?.token);
 			const encryptedUser = encrypt(isStudentLogin ? response?.student : response?.admin);
 			sessionStorage.setItem(appConfig.sessionKeys?.token, encryptedToken?.encrypted);
@@ -62,7 +62,7 @@ const LoginPage = () => {
 					user: isStudentLogin ? response?.student : response?.admin,
 				})
 			);
-			navigate(`${TabValues?.requests?.to}`);
+			navigate(isStudentLogin ? `${TabValues?.requests?.to}` : "/history");
 		} catch (error) {
 			toast.error(error?.data?.message);
 		}
@@ -77,7 +77,7 @@ const LoginPage = () => {
 	};
 	useEffect(() => {
 		if (isAuthenticated) {
-			return navigate(`/`);
+			return navigate(isStudentLogin ? `${TabValues?.requests?.to}` : "/history");
 		}
 	}, [isAuthenticated]);
 	return (

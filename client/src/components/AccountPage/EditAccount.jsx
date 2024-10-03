@@ -65,7 +65,7 @@ const EditAccount = ({ open, onEntered, onExited, close }) => {
 				[fieldNames.contactNumber]: data?.student?.contactNumber,
 			});
 		}
-	}, [data, reset, fieldNames]);
+	}, [data, reset]);
 	const onSubmit = (data) => {
 		console.log(data); // Handle form submission
 	};
@@ -210,8 +210,10 @@ const EditAccount = ({ open, onEntered, onExited, close }) => {
 							</Box>
 						</Box>
 					</form>
-					<Box sx={{margin:2	}}>
-						<Button fullWidth variant="contained">Submit</Button>
+					<Box sx={{ margin: 2 }}>
+						<Button fullWidth variant="contained">
+							Submit
+						</Button>
 					</Box>
 				</Box>
 			</Paper>

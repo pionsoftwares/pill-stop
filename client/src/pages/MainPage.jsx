@@ -1,9 +1,11 @@
 import { Box } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import BottomBar from "../components/navs/BottomBar";
 import Navbar from "../components/navs/Navbar";
 import "../styles/MainPage.scss";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { TabValues } from "../schemas/pages";
 
 const MainPage = () => {
 	return (

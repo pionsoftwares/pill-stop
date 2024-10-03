@@ -1,24 +1,45 @@
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
+	Box,
+	Button,
 	Card,
 	CardContent,
-	Typography,
-	IconButton,
-	Dialog,
-	DialogTitle,
-	DialogContent,
-	Divider,
 	Chip,
-	Box,
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	Divider,
+	IconButton,
+	Typography,
 } from "@mui/material";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import React, { useState } from "react";
-import RequestButton from "./RequestButton"; // Import the reusable button component
-import useConfirm from "../../hooks/useConfirm";
-import { useRequestMedicineMutation } from "../../features/api/medicineApi";
+import { useSelector } from "react-redux";
 import { toast } from "sonner";
-const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, genericName }) => {
+import {
+	useApproveRequestMutation,
+	useRejectRequestMutation,
+	useRequestMedicineMutation,
+} from "../../features/api/medicineApi";
+import useConfirm from "../../hooks/useConfirm";
+import RequestButton from "./RequestButton"; // Import the reusable button component
+import { AccountBalance, AssignmentIndRounded, FaceRounded } from "@mui/icons-material";
+const MedicineCard = ({
+	name,
+	image,
+	isRecommended,
+	symptoms,
+	currentSymptoms,
+	genericName,
+	requestId,
+	statusLabel,
+	requestedBy,
+}) => {
 	const confirm = useConfirm();
 	const [requestMeds] = useRequestMedicineMutation();
+	const [approveRequest] = useApproveRequestMutation();
+	const [rejectRequest] = useRejectRequestMutation();
+	const userData = useSelector((state) => state.auth.user);
+	const isAdmin = !userData?.studentCode;
 
 	const matchingCurrentSymptoms = currentSymptoms?.filter((symptom) =>
 		symptoms.some((s) => s.toLowerCase().includes(symptom.toLowerCase()))
@@ -42,7 +63,12 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 	};
 
 	const filteredSymptoms = filterSymptoms(symptoms);
-	const filteredCurrentSymptoms = filterSymptoms(matchingCurrentSymptoms);
+
+	// Updated logic to filter out current symptoms and return the symptom itself if no match is found
+	const filteredCurrentSymptoms = currentSymptoms?.map((symptom) => {
+		const match = filteredSymptoms.find((s) => s.toLowerCase().includes(symptom.toLowerCase()));
+		return match || symptom; // Return the matched symptom or the original if no match
+	});
 	const isButtonDisabled = currentSymptoms.length === 0; // Disable button if no current symptoms
 
 	const requestMedicine = () => {
@@ -51,7 +77,11 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 		confirm({
 			title,
 			description,
-			callback: () => requestMeds({ symptoms: currentSymptoms?.[0], medicineName: name }).unwrap(),
+			callback: () =>
+				requestMeds({
+					symptoms: filteredCurrentSymptoms?.[0] ?? currentSymptoms?.[0],
+					medicineName: name,
+				}).unwrap(),
 		})
 			.then((res) => {
 				if (res.isConfirmed) {
@@ -64,7 +94,50 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 				}
 			});
 	};
-
+	const approve = () => {
+		const title = `Approve Confirmation`;
+		const description = `You are about to approve for ${name}, continue?`;
+		confirm({
+			title,
+			description,
+			callback: () =>
+				approveRequest({
+					medicineRequestId: requestId,
+				}).unwrap(),
+		})
+			.then((res) => {
+				if (res.isConfirmed) {
+					toast.success(res?.result?.message, { position: "top-center" });
+				}
+			})
+			.catch((error) => {
+				if (error?.isConfirmed) {
+					toast.error(error?.error?.data?.message);
+				}
+			});
+	};
+	const reject = () => {
+		const title = `Approve Confirmation`;
+		const description = `You are about to approve for ${name}, continue?`;
+		confirm({
+			title,
+			description,
+			callback: () =>
+				rejectRequest({
+					medicineRequestId: requestId,
+				}).unwrap(),
+		})
+			.then((res) => {
+				if (res.isConfirmed) {
+					toast.success(res?.result?.message, { position: "top-center" });
+				}
+			})
+			.catch((error) => {
+				if (error?.isConfirmed) {
+					toast.error(error?.error?.data?.message);
+				}
+			});
+	};
 	return (
 		<Card
 			sx={{
@@ -73,6 +146,7 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 				alignItems: "center",
 				padding: "1rem",
 				margin: "1rem",
+				minHeight: "150px",
 				position: "relative",
 				boxShadow: 3,
 				transition: "none", // Remove hover transformation
@@ -83,23 +157,51 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 				<Typography variant="h6" component="div">
 					{name}
 				</Typography>{" "}
-				{isRecommended && matchingCurrentSymptoms && (
-					<Typography color="text.secondary">
-						<Chip label="Recommended" color="success" size="small" />
-					</Typography>
+				<Typography variant="caption">{genericName}</Typography>
+				{isAdmin && statusLabel && (
+					<>
+						<Typography variant="caption" component="div" display={"flex"} alignItems={"center"}>
+							{`${requestedBy?.firstName} ${requestedBy?.lastName}`}
+						</Typography>
+						<Typography variant="caption" component="div" display={"flex"} alignItems={"center"}>
+							{`${requestedBy?.studentCode}`}
+						</Typography>
+					</>
 				)}
-				<Typography variant="caption" component="div">
-					{genericName}
-				</Typography>
+				{((isRecommended && matchingCurrentSymptoms) || statusLabel) && (
+					<Chip
+						label={statusLabel ?? "Recommended"}
+						color={
+							statusLabel === "Approved" || isRecommended
+								? "success"
+								: statusLabel === "Rejected"
+								? "error"
+								: "warning"
+						}
+						size="small"
+					/>
+				)}
 			</CardContent>
 			{/* Small Request Button on the right side of the card */}
-			<RequestButton
-				disabled={isButtonDisabled}
-				onClick={() => {
-					// Handle the request logic here
-					requestMedicine();
-				}}
-			/>
+			{!statusLabel && (
+				<RequestButton
+					disabled={isButtonDisabled}
+					onClick={() => {
+						// Handle the request logic here
+						requestMedicine();
+					}}
+				/>
+			)}
+			{isAdmin && statusLabel?.toLowerCase() == "pending" && (
+				<Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", alignSelf: "flex-end" }}>
+					<Button variant="contained" color="success" onClick={approve}>
+						Approve
+					</Button>
+					<Button variant="contained" onClick={reject}>
+						Reject
+					</Button>
+				</Box>
+			)}
 
 			{/* Always visible Help Icon */}
 			<IconButton onClick={handleClickOpen} sx={{ position: "absolute", top: 10, right: 10 }}>
@@ -107,7 +209,7 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 			</IconButton>
 
 			{/* Dialog to show symptoms */}
-			<Dialog open={open} onClose={handleClose}>
+			<Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
 				<DialogTitle>{name}</DialogTitle>
 				<DialogContent>
 					<Box
@@ -119,6 +221,42 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 					>
 						<img src={image} alt={name} width={100} height={100} style={{ marginRight: "1rem" }} />
 					</Box>
+					{isAdmin && statusLabel && (
+						<Box display={"flex"} justifyContent={"space-between"} alignItems={"flex-start"}>
+							<Box display={"flex"} flexDirection="column" gap={1}>
+								<Typography
+									variant="caption"
+									component="div"
+									display={"flex"}
+									alignItems={"center"}
+									gap={1}
+								>
+									<FaceRounded />
+									{`${requestedBy?.firstName} ${requestedBy?.lastName}`}
+								</Typography>
+								<Typography
+									variant="caption"
+									component="div"
+									display={"flex"}
+									alignItems={"center"}
+									gap={1}
+								>
+									<AssignmentIndRounded />
+									{`${requestedBy?.studentCode}`}
+								</Typography>
+							</Box>
+							<Typography
+								variant="caption"
+								component="div"
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<AccountBalance />
+								{`${requestedBy.association}`}
+							</Typography>
+						</Box>
+					)}
 					<Divider textAlign="left">
 						<Typography variant="caption">Medication for:</Typography>
 					</Divider>
@@ -133,37 +271,60 @@ const MedicineCard = ({ name, image, isRecommended, symptoms, currentSymptoms, g
 							/>
 						))}
 					</Box>
-
-					{filteredCurrentSymptoms.length > 0 && ( // Conditional rendering
+					{(isAdmin ? currentSymptoms : filteredCurrentSymptoms)?.length > 0 && ( // Conditional rendering
 						<>
 							<Divider textAlign="left" sx={{ my: 2 }}>
-								<Typography variant="caption">You are feeling:</Typography>
+								<Typography variant="caption">
+									{isAdmin ? "Student experiences" : "May address your:"}
+								</Typography>
 							</Divider>
 							<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-								{filteredCurrentSymptoms.map((currentSymptom) => (
-									<Chip
-										size="small"
-										color="warning"
-										key={currentSymptom}
-										label={currentSymptom} // Display only the filtered English terms
-										variant="filled"
-									/>
-								))}
+								{(isAdmin ? currentSymptoms : filteredCurrentSymptoms).map((currentSymptom) => {
+									return (
+										<Chip
+											size="small"
+											color="warning"
+											key={currentSymptom} // Ensure this is unique
+											label={currentSymptom} // Display only the filtered English terms
+											variant="filled"
+										/>
+									);
+								})}
 							</Box>
 						</>
 					)}
 				</DialogContent>
 				{/* Small Request Button on the right side of the dialog */}
-				<Box sx={{ display: "flex", justifyContent: "flex-end", padding: 2 }}>
-					<RequestButton
-						onClick={() => {
-							// Handle the request logic here
-							requestMedicine();
-							setOpen(false);
+				{!statusLabel && (
+					<Box sx={{ display: "flex", justifyContent: "flex-end", padding: 2 }}>
+						<RequestButton
+							onClick={() => {
+								// Handle the request logic here
+								requestMedicine();
+								setOpen(false);
+							}}
+							disabled={isButtonDisabled} // Disable the button based on current symptoms
+						/>
+					</Box>
+				)}{" "}
+				{isAdmin && statusLabel?.toLowerCase() == "pending" && (
+					<Box
+						sx={{
+							display: "flex",
+							flexDirection: "row",
+							gap: "1rem",
+							padding: "1rem",
+							alignSelf: "flex-end",
 						}}
-						disabled={isButtonDisabled} // Disable the button based on current symptoms
-					/>
-				</Box>
+					>
+						<Button variant="contained" color="success" onClick={approve}>
+							Approve
+						</Button>
+						<Button variant="contained" onClick={reject}>
+							Reject
+						</Button>
+					</Box>
+				)}
 			</Dialog>
 		</Card>
 	);

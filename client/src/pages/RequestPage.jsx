@@ -57,14 +57,6 @@ const RequestPage = () => {
 							variant="filled"
 							size="small"
 							placeholder="Fever, nausea, heartburn"
-							InputProps={{
-								...params.InputProps,
-								endAdornment: (
-									<InputAdornment position="end">
-										<SearchRounded />
-									</InputAdornment>
-								),
-							}}
 							sx={{
 								"& .MuiFilledInput-root": {
 									backgroundColor: "white",
@@ -77,7 +69,7 @@ const RequestPage = () => {
 					)}
 				/>
 			</Box>
-			<Box className="content" sx={{ display: "flex", flexDirection: "column" }}>
+			<Box className="content" sx={{ display: "flex", flexDirection: "column", overflow: "auto" }}>
 				{sortedMedicines.length > 0 ? (
 					sortedMedicines.map((medicine) => {
 						// Filter current symptoms to only include those that match the medicine's symptoms

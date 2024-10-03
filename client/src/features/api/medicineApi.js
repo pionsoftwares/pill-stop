@@ -1,7 +1,7 @@
 import { api } from ".";
 import appConfig from "../../config";
 
-const medicineApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.medicine] }).injectEndpoints({
+const medicineApi = api.enhanceEndpoints({ addTagTypes: ["MEDICINE"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		requestMedicine: builder.mutation({
 			query: (body) => ({
@@ -9,37 +9,41 @@ const medicineApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.m
 				method: "POST",
 				body,
 			}),
-			invalidatesTags: [appConfig.sessionKeys.medicine],
+			invalidatesTags: ["MEDICINE"],
 		}),
 		getStudentRequest: builder.query({
 			query: () => ({
 				url: appConfig.apiEndpoints.requestMedicine, // Use centralized endpoint
 				method: "GET",
 			}),
-			providesTags: [appConfig.sessionKeys.medicine],
+			providesTags: ["MEDICINE"],
 		}),
 		getAdminRequest: builder.query({
 			query: () => ({
 				url: appConfig.apiEndpoints.requestMedicine, // Use centralized endpoint
 				method: "GET",
 			}),
-			providesTags: [appConfig.sessionKeys.medicine],
+			providesTags: ["MEDICINE"],
 		}),
 		approveRequest: builder.mutation({
-			query: (params) => ({
-				url: appConfig.apiEndpoints.requestMedicine, // Use centralized endpoint
-				method: "PUT",
-				params,
-			}),
-			providesTags: [appConfig.sessionKeys.medicine],
+			query: (params) => {
+				const url = `/approve${appConfig.apiEndpoints.requestMedicine}/${params?.medicineRequestId}`;
+				return {
+					url,
+					method: "PUT",
+				};
+			},
+			invalidatesTags: ["MEDICINE"],
 		}),
 		rejectRequest: builder.mutation({
-			query: (params) => ({
-				url: appConfig.apiEndpoints.requestMedicine, // Use centralized endpoint
-				method: "PUT",
-				params,
-			}),
-			invalidatesTags: [appConfig.sessionKeys.medicine],
+			query: (params) => {
+				const url = `/reject${appConfig.apiEndpoints.requestMedicine}/${params?.medicineRequestId}`;
+				return {
+					url,
+					method: "PUT",
+				};
+			},
+			invalidatesTags: ["MEDICINE"],
 		}),
 	}),
 });

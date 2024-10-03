@@ -1,7 +1,7 @@
 import { api } from ".";
 import appConfig from "../../config";
 
-const studentApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.students] }).injectEndpoints({
+const studentApi = api.enhanceEndpoints({ addTagTypes: ["STUDENT"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		createStudent: builder.mutation({
 			query: (body) => ({
@@ -9,7 +9,7 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.st
 				method: "POST",
 				body,
 			}),
-			invalidatesTags: [appConfig.sessionKeys.students],
+			invalidatesTags: ["STUDENT"],
 		}),
 		updateStudent: builder.mutation({
 			query: (params, body) => ({
@@ -18,7 +18,7 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.st
 				params,
 				body,
 			}),
-			invalidatesTags: [appConfig.sessionKeys.students],
+			invalidatesTags: ["STUDENT"],
 		}),
 		getAllStudents: builder.query({
 			query: (params) => ({
@@ -26,7 +26,7 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.st
 				method: "GET",
 				params,
 			}),
-			providesTags: [appConfig.sessionKeys.students],
+			providesTags: ["STUDENT"],
 		}),
 		getStudentById: builder.query({
 			query: (params) => ({
@@ -34,7 +34,7 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.st
 				method: "GET",
 				params,
 			}),
-			providesTags: [appConfig.sessionKeys.students],
+			providesTags: ["STUDENT"],
 		}),
 		getCurrentStudent: builder.query({
 			query: (params) => ({
@@ -42,7 +42,7 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: [appConfig.sessionKeys.st
 				method: "GET",
 				params,
 			}),
-			providesTags: [appConfig.sessionKeys.students],
+			providesTags: ["STUDENT"],
 		}),
 	}),
 });
