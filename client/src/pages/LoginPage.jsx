@@ -21,7 +21,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import logo from "../assets/Logo.svg";
 import LandingSlide from "../components/LandingSlide";
-import appConfig from "../config.jsX";
+import appConfig from "../config.jsx";
 import {
   useLoginAdminMutation,
   useLoginStudentMutation,
