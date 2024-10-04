@@ -1,4 +1,5 @@
 const yup = require("yup");
+const { updateStudent } = require("../controllers/StudentController");
 
 const authSchemas = {
   loginStudent: yup.object().shape({
@@ -62,6 +63,42 @@ const studentSchemas = {
         .string()
         .required("Password is required")
         .typeError("Password should be a string"),
+      association: yup
+        .string()
+        .required("Association is required")
+        .typeError("Association should be a string"),
+      birthday: yup
+        .date()
+        .required("Birthday is required")
+        .typeError("Birthday should be a valid date"),
+      medicalHistory: yup
+        .string()
+        .typeError("Medical history should be a string"),
+      allergies: yup.string().typeError("Allergies should be a string"),
+      emergencyContactName: yup
+        .string()
+        .typeError("Emergency contact name should be a string"),
+      emergencyContactNumber: yup
+        .string()
+        .typeError("Emergency contact number should be a string"),
+      relationship: yup.string().typeError("Relationship should be a string"),
+    }),
+  }),
+  updateStudent: yup.object().shape({
+    body: yup.object().shape({
+      firstName: yup
+        .string()
+        .required("First name is required")
+        .typeError("First name should be a string"),
+      middleName: yup.string().typeError("Middle name should be a string"),
+      lastName: yup
+        .string()
+        .required("Last name is required")
+        .typeError("Last name should be a string"),
+      studentCode: yup
+        .string()
+        .required("Student code is required")
+        .typeError("Student code should be a string"),
       association: yup
         .string()
         .required("Association is required")
