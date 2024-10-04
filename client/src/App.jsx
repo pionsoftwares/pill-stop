@@ -7,15 +7,23 @@ import { Provider } from "react-redux";
 import store from "./app/store";
 import { Toaster } from "sonner";
 import ConfirmProvider from "./context/ConfirmContext";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import ReasonProvider from "./context/ReasonContext";
+
 function App() {
 	return (
 		<Provider store={store}>
 			<Toaster richColors closeButton position="top-center" visibleToasts={1} expand={false} />
 			<Box className="app">
 				<ProvidesTheme>
-					<ConfirmProvider>
-						<RouterProvider router={router}></RouterProvider>
-					</ConfirmProvider>
+					<ReasonProvider>
+						<ConfirmProvider>
+							<LocalizationProvider dateAdapter={AdapterMoment}>
+								<RouterProvider router={router}></RouterProvider>
+							</LocalizationProvider>
+						</ConfirmProvider>
+					</ReasonProvider>
 				</ProvidesTheme>
 			</Box>
 		</Provider>

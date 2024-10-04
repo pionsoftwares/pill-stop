@@ -5,6 +5,8 @@ import {
 	AccountCircleRounded,
 	AddCircleOutline,
 	AddCircleRounded,
+	PersonOutline,
+	PersonRounded,
 } from "@mui/icons-material";
 import { createTabItem } from "./utils/createTabItem";
 
@@ -81,14 +83,14 @@ const appConfig = {
 		firstName: "First Name",
 		middleName: "Middle Name",
 		lastName: "Last Name",
-		birthdate: "Birthdate (MM/DD/YYYY)",
+		birthdate: "Birthday",
 		studentNumber: "Student Number",
-		department: "Department",
+		department: "Association",
 		medicalHistory: "Medical History",
 		allergies: "Allergies",
-		emergencyContact: "Name of Emergency Contact",
-		relationship: "Relationship To Student",
-		contactNumber: "Contact Number",
+		emergencyContact: "Emergency Contact Name",
+		relationship: "Relationship",
+		contactNumber: "Emergency Contact Number",
 	},
 	formSections: {
 		personalInfo: "Personal Information",
@@ -110,6 +112,7 @@ const appConfig = {
 		medicine: "MEDICINE",
 	},
 	navItems: {
+		users: createTabItem("Users", <PersonOutline />, <PersonRounded />),
 		requests: createTabItem("Requests", <AddCircleOutline />, <AddCircleRounded />),
 		home: createTabItem("History", <AccessTimeOutlined />, <AccessTimeFilledRounded />),
 		account: createTabItem("Account", <AccountCircleOutlined />, <AccountCircleRounded />),

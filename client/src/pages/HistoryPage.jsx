@@ -88,6 +88,8 @@ const HistoryPage = () => {
 					currentRequests.map((request) => {
 						return (
 							<MedicineCard
+								code={request?.approval?.medicineCode?.code}
+								rejection={request?.rejection}
 								key={request.id}
 								requestId={request?.id}
 								statusLabel={request?.status}

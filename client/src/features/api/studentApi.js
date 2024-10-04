@@ -12,12 +12,13 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: ["STUDENT"] }).injectEndp
 			invalidatesTags: ["STUDENT"],
 		}),
 		updateStudent: builder.mutation({
-			query: (params, body) => ({
-				url: appConfig.apiEndpoints.student, // Use centralized endpoint
-				method: "PUT",
-				params,
-				body,
-			}),
+			query: ({ id, body }) => {
+				return {
+					url: `${appConfig.apiEndpoints.student}/${id}`, // Use centralized endpoint
+					method: "PUT",
+					body: body,
+				};
+			},
 			invalidatesTags: ["STUDENT"],
 		}),
 		getAllStudents: builder.query({
@@ -30,7 +31,7 @@ const studentApi = api.enhanceEndpoints({ addTagTypes: ["STUDENT"] }).injectEndp
 		}),
 		getStudentById: builder.query({
 			query: (params) => ({
-				url: appConfig.apiEndpoints.student, // Use centralized endpoint
+				url: `${appConfig.apiEndpoints.student}/${params.id}`, // Use centralized endpoint
 				method: "GET",
 				params,
 			}),

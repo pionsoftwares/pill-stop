@@ -12,13 +12,13 @@ const AccountPage = () => {
 	const [isEditAccount, setIsEditAccount] = useState(false);
 	const [isClickAwayActive, setIsClickAwayActive] = useState(false);
 	const userData = useSelector((state) => state.auth.user);
+	const isAdmin = !userData?.studentCode;
 
 	const handleOpenEdit = () => {
 		setIsEditAccount(true);
 	};
 
 	const handleCloseEdit = () => {
-		console.log("triggering");
 		setIsEditAccount(false);
 		setIsClickAwayActive(false);
 	};
@@ -30,14 +30,14 @@ const AccountPage = () => {
 				<Box className="account-page__user-content">
 					<Avatar
 						className="account-page__avatar"
-						{...stringAvatar(`${userData?.firstName}`)}
+						{...stringAvatar(isAdmin ? "Admin" : `${userData?.firstName}`)}
 						style={{
 							border: "2px solid white",
 						}}
 					/>
 					<Box>
 						<Typography variant="h6" fontWeight={"bold"} color="primary">
-							{`${userData?.firstName} ${userData?.lastName}`}
+							{isAdmin ? "Admin" : `${userData?.firstName} ${userData?.lastName}`}
 						</Typography>
 						<Typography variant="caption">{userData?.studentCode}</Typography>
 					</Box>
@@ -80,6 +80,8 @@ const AccountPage = () => {
 					<EditAccount
 						open={isEditAccount}
 						close={handleCloseEdit}
+						studentId={userData?.id}
+						isUpdate={true}
 						direction="up"
 						timeout={300}
 						onEntered={() => setIsClickAwayActive(true)}

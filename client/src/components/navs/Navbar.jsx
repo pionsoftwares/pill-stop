@@ -29,7 +29,6 @@ const Navbar = () => {
 			elevation={0}
 			sx={{ backgroundColor: (theme) => theme.palette.primary.main, borderRadius: 0 }}
 		>
-			{" "}
 			<Typography variant="title" fontWeight={"bold"} color="primary.contrastText">
 				{appConfig.appName.toPascalCase().toUpperCase()}
 			</Typography>

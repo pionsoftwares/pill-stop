@@ -16,7 +16,7 @@ import { accountSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
 
-const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, studentId }) => {
+const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate, studentId }) => {
 	const fieldNames = {
 		username: toCamelCase(appConfig.formFields.username),
 		password: toCamelCase(appConfig.formFields.password),
@@ -327,4 +327,4 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 	);
 };
 
-export default EditAccount;
+export default EditAdmin;

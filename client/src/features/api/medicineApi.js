@@ -36,11 +36,12 @@ const medicineApi = api.enhanceEndpoints({ addTagTypes: ["MEDICINE"] }).injectEn
 			invalidatesTags: ["MEDICINE"],
 		}),
 		rejectRequest: builder.mutation({
-			query: (params) => {
-				const url = `/reject${appConfig.apiEndpoints.requestMedicine}/${params?.medicineRequestId}`;
+			query: ({ id, body }) => {
+				const url = `/reject${appConfig.apiEndpoints.requestMedicine}/${id}`;
 				return {
 					url,
 					method: "PUT",
+					body,
 				};
 			},
 			invalidatesTags: ["MEDICINE"],

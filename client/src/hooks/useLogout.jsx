@@ -4,6 +4,7 @@ import { logoutSlice } from "../features/slices/authSlice";
 import useConfirm from "./useConfirm";
 
 import { useNavigate } from "react-router-dom";
+import { api } from "../features/api";
 
 export const useLogout = () => {
 	const dispatch = useDispatch();
@@ -17,6 +18,7 @@ export const useLogout = () => {
 					dispatch(logoutSlice());
 					sessionStorage.clear();
 					resolve("Logout successful");
+					dispatch(api.util.resetApiState());
 				} catch (error) {
 					reject("Logout failed");
 				}

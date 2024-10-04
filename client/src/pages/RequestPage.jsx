@@ -1,9 +1,8 @@
-import { Box, TextField, InputAdornment, Autocomplete, Typography } from "@mui/material";
-import SearchRounded from "@mui/icons-material/SearchRounded";
+import { Autocomplete, Box, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
-import "../styles/RequestPage.scss";
-import appConfig from "../config";
 import MedicineCard from "../components/RequestPage/MedicineCard";
+import appConfig from "../config";
+import "../styles/RequestPage.scss";
 
 const RequestPage = () => {
 	const [selectedSymptoms, setSelectedSymptoms] = useState([]);

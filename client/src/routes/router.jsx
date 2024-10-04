@@ -8,6 +8,7 @@ import MainPage from "../pages/MainPage";
 import NotFound from "../pages/NotFound";
 import PrivateRoutes from "../pages/PrivateRoutes";
 import RequestPage from "../pages/RequestPage";
+import UsersPage from "../pages/UsersPage.jsx";
 
 export const router = createBrowserRouter([
 	{
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
 				path: "/",
 				element: <MainPage />,
 				children: [
+					{
+						path: appConfig?.navItems?.users?.to,
+						element: <UsersPage />,
+					},
 					{
 						path: appConfig?.navItems?.home?.to,
 						element: <HistoryPage />,

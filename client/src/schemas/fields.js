@@ -17,16 +17,16 @@ export const loginSchema = yup.object().shape({
 });
 
 export const accountSchema = yup.object().shape({
-	[appConfig.formFields.firstName.toLowerCase()]: yup
+	[appConfig.formFields.firstName.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.firstName) + isRequired),
 
-	[appConfig.formFields.middleName.toLowerCase()]: yup.string(),
-	[appConfig.formFields.lastName.toLowerCase()]: yup
+	[appConfig.formFields.middleName.toCamelCase()]: yup.string(),
+	[appConfig.formFields.lastName.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.lastName) + isRequired),
 
-	[appConfig.formFields.birthdate.toLowerCase()]: yup
+	[appConfig.formFields.birthdate.toCamelCase()]: yup
 		.string()
 		.test(
 			"valid-date",
@@ -35,32 +35,35 @@ export const accountSchema = yup.object().shape({
 		)
 		.required(toCapitalCase(appConfig.formFields.birthdate) + isRequired),
 
-	[appConfig.formFields.studentNumber.toLowerCase()]: yup
+	[appConfig.formFields.studentNumber.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.studentNumber) + isRequired),
 
-	[appConfig.formFields.department.toLowerCase()]: yup
+	[appConfig.formFields.department.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.department) + isRequired),
 
-	[appConfig.formFields.medicalHistory.toLowerCase()]: yup
+	[appConfig.formFields.medicalHistory.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.medicalHistory) + isRequired),
 
-	[appConfig.formFields.allergies.toLowerCase()]: yup
+	[appConfig.formFields.allergies.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.allergies) + isRequired),
 
-	[appConfig.formFields.emergencyContact.toLowerCase()]: yup
+	[appConfig.formFields.emergencyContact.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.emergencyContact) + isRequired),
 
-	[appConfig.formFields.relationship.toLowerCase()]: yup
+	[appConfig.formFields.relationship.toCamelCase()]: yup
 		.string()
 		.required(toCapitalCase(appConfig.formFields.relationship) + isRequired),
 
-	[appConfig.formFields.contactNumber.toLowerCase()]: yup
+	[appConfig.formFields.contactNumber.toCamelCase()]: yup
 		.string()
-		.matches(/^\d{10}$/, toCapitalCase(appConfig.formFields.contactNumber) + invalidFormat)
+		.matches(
+			/^(09\d{9}|(\+639)\d{9})$/,
+			toCapitalCase(appConfig.formFields.contactNumber) + invalidFormat // Custom error message for invalid format
+		)
 		.required(toCapitalCase(appConfig.formFields.contactNumber) + isRequired),
 });
