@@ -1,0 +1,17 @@
+// styles.scss
+
+.navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	min-height: 3rem;
+	right: 0;
+	padding: 1rem;
+	transition: opacity 0.5s ease; // Smooth transition for the opacity change
+	opacity: 1; // Initial opacity
+
+	&.fade {
+		transition: opacity 0.5s ease;
+		opacity: 0; // Fade out when scrolling
+	}
+}
