@@ -245,7 +245,6 @@ const StudentController = {
           middleName,
           lastName,
           studentCode,
-          password,
           association,
           birthday,
         },
