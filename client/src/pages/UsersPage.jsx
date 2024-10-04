@@ -1,4 +1,4 @@
-import { Box, Button, ClickAwayListener, Typography } from "@mui/material";
+import { Backdrop, Box, Button, ClickAwayListener, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useGetAllStudentsQuery } from "../features/api/studentApi";
 import UserCard from "../components/UserPage/UserCard";
@@ -30,7 +30,6 @@ const UsersPage = () => {
 				</Typography>
 				<Button
 					startIcon={<AddOutlined />}
-					size="small"
 					variant="contained"
 					onClick={() => {
 						handleOpenEdit();
@@ -61,7 +60,6 @@ const UsersPage = () => {
 					const paperElement = document.querySelector(".account-page__form");
 					if (isClickAwayActive && isEditAccount && paperElement && !paperElement.contains(event.target)) {
 						handleCloseEdit();
-						console.log("Clicked away");
 					}
 				}}
 			>
@@ -78,6 +76,13 @@ const UsersPage = () => {
 					/>
 				</Box>
 			</ClickAwayListener>
+			<Backdrop
+				sx={{ color: "#fff", zIndex: 50 }}
+				open={isEditAccount}
+				onClick={() => {
+					handleCloseEdit();
+				}}
+			/>
 		</Box>
 	);
 };

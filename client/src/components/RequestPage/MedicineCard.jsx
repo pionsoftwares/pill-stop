@@ -1,9 +1,19 @@
 import {
+	AccountBalance,
+	AssignmentIndRounded,
+	FaceRounded,
+	HelpOutline,
+	Inventory2Outlined,
+	VisibilityOutlined,
+} from "@mui/icons-material";
+import {
+	Backdrop,
 	Box,
 	Button,
 	Card,
 	CardContent,
 	Chip,
+	ClickAwayListener,
 	Dialog,
 	DialogContent,
 	DialogTitle,
@@ -21,12 +31,13 @@ import {
 } from "../../features/api/medicineApi";
 import useConfirm from "../../hooks/useConfirm";
 import useReason from "../../hooks/useReason";
+import EditAccount from "../AccountPage/EditAccount";
 import RequestButton from "./RequestButton"; // Import the reusable button component
-import { AccountBalance, AssignmentIndRounded, FaceRounded, HelpOutline } from "@mui/icons-material";
 const MedicineCard = ({
 	name,
 	image,
 	isRecommended,
+	remaining,
 	code,
 	symptoms,
 	currentSymptoms,
@@ -34,6 +45,7 @@ const MedicineCard = ({
 	genericName,
 	requestId,
 	statusLabel,
+	requestButton = true,
 	requestedBy,
 }) => {
 	const confirm = useConfirm();
@@ -43,12 +55,21 @@ const MedicineCard = ({
 	const [rejectRequest] = useRejectRequestMutation();
 	const userData = useSelector((state) => state.auth.user);
 	const isAdmin = !userData?.studentCode;
-
+	const [isEditAccount, setIsEditAccount] = useState(false);
+	const [isUpdate, setIsUpdate] = useState(false);
+	const [isClickAwayActive, setIsClickAwayActive] = useState(false);
 	const matchingCurrentSymptoms = currentSymptoms?.filter((symptom) =>
 		symptoms.some((s) => s.toLowerCase().includes(symptom.toLowerCase()))
 	);
 	const [open, setOpen] = useState(false);
+	const handleOpenEdit = () => {
+		setIsEditAccount(true);
+	};
 
+	const handleCloseEdit = () => {
+		setIsEditAccount(false);
+		setIsClickAwayActive(false);
+	};
 	const handleClickOpen = () => {
 		setOpen(true);
 	};
@@ -168,9 +189,9 @@ const MedicineCard = ({
 							<Typography variant="caption" component="div" display={"flex"} alignItems={"center"}>
 								{`${requestedBy?.firstName} ${requestedBy?.lastName}`}
 							</Typography>
-							<Typography variant="caption" component="div" display={"flex"} alignItems={"center"}>
+							{/* <Typography variant="caption" component="div" display={"flex"} alignItems={"center"}>
 								{`${requestedBy?.studentCode}`}
-							</Typography>
+							</Typography> */}
 						</>
 					)}
 					<Box display={"flex"} flexDirection={"column"}>
@@ -187,6 +208,11 @@ const MedicineCard = ({
 									}
 									size="small"
 								/>
+							</Box>
+						)}{" "}
+						{remaining && (
+							<Box>
+								<Chip size="small" color="info" label={"Stocks: " + remaining} />
 							</Box>
 						)}
 						{rejection ? (
@@ -211,7 +237,7 @@ const MedicineCard = ({
 					</Box>
 				</CardContent>
 				{/* Small Request Button on the right side of the card */}
-				{!statusLabel && (
+				{!statusLabel && requestButton && (
 					<RequestButton
 						disabled={isButtonDisabled}
 						onClick={() => {
@@ -227,7 +253,7 @@ const MedicineCard = ({
 							flexDirection: "column",
 							gap: "1rem",
 							alignSelf: "flex-end",
-							zIndex: 999,
+							zIndex: 2,
 						}}
 					>
 						<Button variant="contained" color="success" onClick={approve}>
@@ -284,8 +310,33 @@ const MedicineCard = ({
 						<img src={image} alt={name} width={100} height={100} style={{ marginRight: "1rem" }} />
 					</Box>
 					{isAdmin && statusLabel && (
-						<Box display={"flex"} justifyContent={"space-between"} alignItems={"flex-start"}>
-							<Box display={"flex"} flexDirection="column" gap={1}>
+						<Box display={"flex"} flexDirection={"column"} gap={1}>
+							<Divider textAlign="left">
+								<Typography variant="caption">Requested By:</Typography>
+							</Divider>
+							<Box display={"flex"} justifyContent={"space-between"} alignItems={"flex-start"}>
+								<Box display={"flex"} flexDirection="column" gap={1}>
+									<Typography
+										variant="caption"
+										component="div"
+										display={"flex"}
+										alignItems={"center"}
+										gap={1}
+									>
+										<FaceRounded />
+										{`${requestedBy?.firstName} ${requestedBy?.lastName}`}
+									</Typography>
+									<Typography
+										variant="caption"
+										component="div"
+										display={"flex"}
+										alignItems={"center"}
+										gap={1}
+									>
+										<AssignmentIndRounded />
+										{`${requestedBy?.studentCode}`}
+									</Typography>
+								</Box>
 								<Typography
 									variant="caption"
 									component="div"
@@ -293,34 +344,31 @@ const MedicineCard = ({
 									alignItems={"center"}
 									gap={1}
 								>
-									<FaceRounded />
-									{`${requestedBy?.firstName} ${requestedBy?.lastName}`}
-								</Typography>
-								<Typography
-									variant="caption"
-									component="div"
-									display={"flex"}
-									alignItems={"center"}
-									gap={1}
-								>
-									<AssignmentIndRounded />
-									{`${requestedBy?.studentCode}`}
+									<AccountBalance />
+									{`${requestedBy.association}`}
 								</Typography>
 							</Box>
-							<Typography
-								variant="caption"
-								component="div"
-								display={"flex"}
-								alignItems={"center"}
-								gap={1}
+							<Button
+								fullWidth
+								size="small"
+								variant="outlined"
+								startIcon={<VisibilityOutlined fontSize="inherit" />}
+								onClick={() => {
+									handleOpenEdit();
+									setIsUpdate(true);
+									handleClose();
+								}}
 							>
-								<AccountBalance />
-								{`${requestedBy.association}`}
-							</Typography>
+								View Full Details
+							</Button>
 						</Box>
 					)}
-
-					{!isAdmin && (
+					{remaining && (
+						<Box>
+							<Chip size="small" color="info" label={"Stocks: " + remaining} />
+						</Box>
+					)}
+					{(!isAdmin || remaining) && (
 						<>
 							<Divider textAlign="left">
 								<Typography variant="caption">Medication for:</Typography>
@@ -341,9 +389,7 @@ const MedicineCard = ({
 					{(isAdmin ? currentSymptoms : filteredCurrentSymptoms)?.length > 0 && ( // Conditional rendering
 						<>
 							<Divider textAlign="left" sx={{ my: 2 }}>
-								<Typography variant="caption">
-									{isAdmin ? "Student experiences" : "May address your:"}
-								</Typography>
+								<Typography variant="caption">{isAdmin ? "Symptom" : "May address your:"}</Typography>
 							</Divider>
 							<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
 								{(isAdmin ? currentSymptoms : filteredCurrentSymptoms).map((currentSymptom) => {
@@ -360,6 +406,7 @@ const MedicineCard = ({
 							</Box>
 						</>
 					)}
+
 					{rejection && (
 						<>
 							<Divider textAlign="left" sx={{ my: 2, color: "red" }}>
@@ -370,7 +417,7 @@ const MedicineCard = ({
 					)}
 				</DialogContent>
 				{/* Small Request Button on the right side of the dialog */}
-				{!statusLabel && (
+				{!statusLabel && requestButton && (
 					<Box sx={{ display: "flex", justifyContent: "flex-end", padding: 2 }}>
 						<RequestButton
 							onClick={() => {
@@ -400,7 +447,35 @@ const MedicineCard = ({
 						</Button>
 					</Box>
 				)}
-			</Dialog>
+			</Dialog>{" "}
+			<ClickAwayListener
+				onClickAway={(event) => {
+					const paperElement = document.querySelector(".account-page__form");
+					if (isClickAwayActive && isEditAccount && paperElement && !paperElement.contains(event.target)) {
+						handleCloseEdit();
+					}
+				}}
+			>
+				<Box>
+					<EditAccount
+						open={isEditAccount}
+						close={handleCloseEdit}
+						isViewOnly={isUpdate}
+						direction="up"
+						studentId={isUpdate ? requestedBy?.id : null}
+						timeout={300}
+						onEntered={() => setIsClickAwayActive(true)}
+						onExited={() => setIsClickAwayActive(false)}
+					/>
+				</Box>
+			</ClickAwayListener>
+			<Backdrop
+				sx={{ color: "#fff", zIndex: 2 }}
+				open={isEditAccount}
+				onClick={() => {
+					handleCloseEdit();
+				}}
+			/>
 		</>
 	);
 };

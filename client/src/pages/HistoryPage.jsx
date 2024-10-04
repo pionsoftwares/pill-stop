@@ -67,7 +67,7 @@ const HistoryPage = () => {
 						sx: {
 							backgroundColor: "background.default",
 							position: "absolute",
-							zIndex: 99,
+							zIndex: 1,
 							bottom: "-5px",
 							height: "25px",
 							clipPath: "path('M 0 200 L 0,90 A 5,5 0,0,1 150,75 L 200 200 z');", // Single rounded hill shape

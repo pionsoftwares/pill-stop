@@ -1,6 +1,19 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { EventBusyOutlined, HorizontalRule } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, Paper, Slide, TextField, Typography } from "@mui/material";
+import {
+	AccountBalanceOutlined,
+	AccountBalanceRounded,
+	EventBusyOutlined,
+	GroupOutlined,
+	HorizontalRule,
+	LocalPhoneOutlined,
+	MedicalInformationOutlined,
+	MedicalInformationRounded,
+	PersonOutline,
+	PersonRounded,
+	SourceOutlined,
+	VaccinesOutlined,
+} from "@mui/icons-material";
+import { Backdrop, Box, Button, IconButton, InputAdornment, Paper, Slide, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -16,7 +29,7 @@ import { accountSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
 
-const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, studentId }) => {
+const EditAccount = ({ open, onEntered, onExited, close, isUpdate, studentId, isViewOnly }) => {
 	const fieldNames = {
 		username: toCamelCase(appConfig.formFields.username),
 		password: toCamelCase(appConfig.formFields.password),
@@ -40,10 +53,9 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 		handleSubmit,
 		register,
 		reset,
-
 		control,
 		setValue,
-		formState: { errors },
+		formState: { errors, isDirty },
 	} = useForm({
 		defaultValues: {
 			[fieldNames.firstName]: "",
@@ -62,7 +74,7 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 	});
 	useEffect(() => {
 		reset();
-		if (isUpdate && data) {
+		if ((isUpdate || isViewOnly) && data) {
 			setValue(fieldNames.firstName, data?.student?.firstName || "");
 			setValue(fieldNames.middleName, data?.student?.middleName || "");
 			setValue(fieldNames.lastName, data?.student?.lastName || "");
@@ -92,7 +104,7 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 		try {
 			let response; // Declare response outside the if statement
 
-			if (isUpdate) {
+			if (isUpdate || isViewOnly) {
 				response = await update({ id: studentId, body }).unwrap();
 			} else {
 				response = await create({ ...newData, password: "123", studentCode: data?.studentNumber }).unwrap();
@@ -127,27 +139,53 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 					<form onSubmit={handleSubmit(onSubmit)} id="submit">
 						{/* Personal Information Section */}
 						<Box className="account-page__personal-info" sx={{ marginBottom: "16px" }}>
-							<Typography variant="h6" color="textSecondary" gutterBottom>
-								{appConfig.formSections.personalInfo}
+							<Typography
+								variant="h6"
+								color="textSecondary"
+								gutterBottom
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<PersonRounded /> {appConfig.formSections.personalInfo}
 							</Typography>
+
 							<Box display="flex" flexDirection="column" gap={2}>
 								<TextField
 									size="small"
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.firstName)} // Registering field
 									label={appConfig.formFields.firstName}
 									fullWidth
-									disabled={isUpdate}
+									disabled={isUpdate || isViewOnly}
 									error={!!errors[fieldNames.firstName]} // Error handling
 									helperText={errors[fieldNames.firstName]?.message} // Show error message
 								/>
 								<TextField
 									size="small"
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.lastName)} // Registering field
 									label={appConfig.formFields.lastName}
 									fullWidth
-									disabled={isUpdate}
+									disabled={isUpdate || isViewOnly}
 									error={!!errors[fieldNames.lastName]}
 									helperText={errors[fieldNames.lastName]?.message}
 								/>
@@ -155,13 +193,20 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 									size="small"
 									slotProps={{
 										inputLabel: {
-											...(isUpdate ? { shrink: true } : {}),
+											...(isUpdate || isViewOnly ? { shrink: true } : {}),
+										},
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
 										},
 									}}
 									{...register(fieldNames.middleName)} // Registering field
 									label={appConfig.formFields.middleName}
 									fullWidth
-									disabled={isUpdate}
+									disabled={isUpdate || isViewOnly}
 									error={!!errors[fieldNames.middleName]}
 									helperText={errors[fieldNames.middleName]?.message}
 								/>{" "}
@@ -171,7 +216,7 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 									render={({ field: { onChange, value } }) => (
 										<DatePicker
 											{...value}
-											disabled={isUpdate}
+											disabled={isUpdate || isViewOnly}
 											disableFuture
 											open={openDatepicker}
 											onClose={() => setOpenDatepicker(false)}
@@ -187,7 +232,7 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 												textField: {
 													"data-tour": "step-23",
 													onClick: () => {
-														isUpdate ? null : setOpenDatepicker(true);
+														isUpdate || isViewOnly ? null : setOpenDatepicker(true);
 													},
 													color: "primary",
 
@@ -197,7 +242,7 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 													helperText: errors[fieldNames.birthdate]?.message,
 													slotProps: {
 														inputLabel: {
-															...(isUpdate ? { shrink: true } : {}),
+															...(isUpdate || isViewOnly ? { shrink: true } : {}),
 														},
 													},
 
@@ -207,7 +252,9 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 																<IconButton
 																	tabIndex={-1}
 																	onClick={() =>
-																		isUpdate ? null : setOpenDatepicker(true)
+																		isUpdate || isViewOnly
+																			? null
+																			: setOpenDatepicker(true)
 																	}
 																>
 																	<EventBusyOutlined />
@@ -222,11 +269,11 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 								/>
 								{/* <TextField
 									size="small"
-									slotProps={{ inputLabel: {   ...(isUpdate ? { shrink: true } : {}) } }}
+									slotProps={{ inputLabel: {   ...((isUpdate||isViewOnly) ? { shrink: true } : {}) } }}
 									{...register(fieldNames.birthdate)}
 									label={appConfig.formFields.birthdate}
 									fullWidth
-									disabled={isUpdate}
+									disabled={(isUpdate||isViewOnly)}
 									error={!!errors[fieldNames.birthdate]}
 									helperText={errors[fieldNames.birthdate]?.message}
 								/> */}
@@ -235,27 +282,53 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 
 						{/* Academic Information Section */}
 						<Box className="account-page__academic-info" sx={{ marginBottom: "16px" }}>
-							<Typography variant="h6" color="textSecondary" gutterBottom>
+							<Typography
+								variant="h6"
+								color="textSecondary"
+								gutterBottom
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<AccountBalanceRounded />
 								{appConfig.formSections.academicInfo}
 							</Typography>
 							<Box display="flex" flexDirection="column" gap={2}>
 								<TextField
 									size="small"
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<SourceOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.studentNumber)}
 									label={appConfig.formFields.studentNumber}
-									disabled={isUpdate}
+									disabled={isUpdate || isViewOnly}
 									fullWidth
 									error={!!errors[fieldNames.studentNumber]}
 									helperText={errors[fieldNames.studentNumber]?.message}
 								/>
 								<TextField
 									size="small"
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<AccountBalanceOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.department)}
 									label={appConfig.formFields.department}
 									fullWidth
-									disabled={isUpdate}
+									disabled={isUpdate || isViewOnly}
 									error={!!errors[fieldNames.department]}
 									helperText={errors[fieldNames.department]?.message}
 								/>
@@ -264,12 +337,30 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 
 						{/* Medical Information Section */}
 						<Box className="account-page__medical-info" sx={{ marginBottom: "16px" }}>
-							<Typography variant="h6" color="textSecondary" gutterBottom>
+							<Typography
+								variant="h6"
+								color="textSecondary"
+								gutterBottom
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<MedicalInformationRounded />
 								{appConfig.formSections.medicalInfo}
 							</Typography>
 							<Box display="flex" flexDirection="column" gap={2}>
 								<TextField
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<MedicalInformationOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.medicalHistory)}
 									size="small"
 									label={appConfig.formFields.medicalHistory}
@@ -278,7 +369,17 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 									helperText={errors[fieldNames.medicalHistory]?.message}
 								/>
 								<TextField
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<VaccinesOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.allergies)}
 									size="small"
 									label={appConfig.formFields.allergies}
@@ -287,7 +388,17 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 									helperText={errors[fieldNames.allergies]?.message}
 								/>
 								<TextField
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.emergencyContact)}
 									size="small"
 									label={appConfig.formFields.emergencyContact}
@@ -296,7 +407,17 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 									helperText={errors[fieldNames.emergencyContact]?.message}
 								/>
 								<TextField
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<GroupOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.relationship)}
 									size="small"
 									label={appConfig.formFields.relationship}
@@ -305,7 +426,17 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 									helperText={errors[fieldNames.relationship]?.message}
 								/>
 								<TextField
-									slotProps={{ inputLabel: { ...(isUpdate ? { shrink: true } : {}) } }}
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<LocalPhoneOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
 									{...register(fieldNames.contactNumber)}
 									size="small"
 									label={appConfig.formFields.contactNumber}
@@ -316,11 +447,13 @@ const EditAccount = ({ isAdmin, open, onEntered, onExited, close, isUpdate, stud
 							</Box>
 						</Box>
 					</form>
-					<Box sx={{ margin: 2 }}>
-						<Button fullWidth variant="contained" type="submit" form="submit">
-							Submit
-						</Button>
-					</Box>
+					{!isViewOnly && (
+						<Box sx={{ margin: 2 }}>
+							<Button fullWidth variant="contained" type="submit" form="submit" disabled={!isDirty}>
+								Submit
+							</Button>
+						</Box>
+					)}
 				</Box>
 			</Paper>
 		</Slide>

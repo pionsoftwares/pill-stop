@@ -103,7 +103,9 @@ const appConfig = {
 		studentLogin: "/login/student",
 		adminLogin: "/login/admin",
 		requestMedicine: "/medicine-requests",
+		medicine: "/medicine",
 		student: "/student",
+		admin: "/admin",
 	},
 	sessionKeys: {
 		token: "TOKEN",

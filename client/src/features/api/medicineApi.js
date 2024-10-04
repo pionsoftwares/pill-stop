@@ -46,11 +46,19 @@ const medicineApi = api.enhanceEndpoints({ addTagTypes: ["MEDICINE"] }).injectEn
 			},
 			invalidatesTags: ["MEDICINE"],
 		}),
+		getNumberMedicines: builder.query({
+			query: () => ({
+				url: `${appConfig.apiEndpoints.medicine}/remaining`, // Use centralized endpoint
+				method: "GET",
+			}),
+			providesTags: ["MEDICINE"],
+		}),
 	}),
 });
 
 export const {
 	useRequestMedicineMutation,
+	useGetNumberMedicinesQuery,
 	useApproveRequestMutation,
 	useGetAdminRequestQuery,
 	useGetStudentRequestQuery,

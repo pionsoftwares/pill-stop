@@ -3,17 +3,19 @@ import React, { useState } from "react";
 import MedicineCard from "../components/RequestPage/MedicineCard";
 import appConfig from "../config";
 import "../styles/RequestPage.scss";
+import { useGetNumberMedicinesQuery } from "../features/api/medicineApi";
 
 const RequestPage = () => {
 	const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+	const { data } = useGetNumberMedicinesQuery();
 
-	// Create medicines array from appConfig
 	const medicines = Object.values(appConfig.medicines).map((medicine) => {
 		return {
 			name: medicine.name,
 			symptoms: medicine.symptoms,
 			image: medicine.image,
 			genericName: medicine?.genericName,
+			quantity: data?.remainingMedicineQuantities[medicine.name] || 0, // Include medicine quantity
 		};
 	});
 
@@ -21,18 +23,28 @@ const RequestPage = () => {
 	const allSymptoms = [...new Set(medicines.flatMap((medicine) => medicine.symptoms))];
 
 	// Determine matching counts for each medicine
-	const medicinesWithMatchingCounts = medicines.map((medicine) => ({
-		...medicine,
-		matchingCount: selectedSymptoms.filter((symptom) =>
-			medicine.symptoms.some((s) => s.toLowerCase().includes(symptom.toLowerCase()))
-		).length,
-	}));
+	const medicinesWithMatchingCounts = medicines.map((medicine) => {
+		return {
+			...medicine,
+			matchingCount: selectedSymptoms.filter((symptom) =>
+				medicine.symptoms.some((s) => s.toLowerCase().includes(symptom.toLowerCase()))
+			).length,
+		};
+	});
 
 	// Sort medicines by matching count (desc)
 	const sortedMedicines = medicinesWithMatchingCounts.sort((a, b) => b.matchingCount - a.matchingCount);
 
 	// Get the highest matching count
 	const highestMatchingCount = sortedMedicines[0]?.matchingCount || 0;
+
+	const handleClose = () => {
+		close();
+	};
+	const handleExited = () => {
+		onExited();
+		handleClose();
+	};
 
 	return (
 		<Box className="request-page">
