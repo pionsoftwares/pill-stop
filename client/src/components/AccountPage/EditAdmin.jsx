@@ -17,10 +17,11 @@ import {
 	useUpdateStudentMutation,
 } from "../../features/api/studentApi";
 import usePasswordVisibility from "../../hooks/usePasswordVisibility";
-import { accountSchema } from "../../schemas/fields";
+import { accountSchema, loginSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
 import { useSelector } from "react-redux";
+import { useCreateAdminMutation, useUpdateAdminMutation } from "../../features/api/adminApi";
 
 const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 	const fieldNames = {
@@ -28,10 +29,13 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 		password: toCamelCase(appConfig.formFields.password),
 	};
 	const userData = useSelector((state) => state.auth.user);
+
+	console.log("👻 ~ userData:", userData);
+
 	const { visibility, toggleVisibility } = usePasswordVisibility();
 
-	const [create] = useCreateStudentMutation();
-	const [update] = useUpdateStudentMutation();
+	const [create] = useCreateAdminMutation();
+	const [update] = useUpdateAdminMutation();
 
 	const {
 		handleSubmit,
@@ -44,7 +48,7 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 			[fieldNames.username]: "",
 			[fieldNames.password]: "",
 		},
-		resolver: yupResolver(accountSchema), // Assuming you have a validation schema
+		resolver: yupResolver(loginSchema), // Assuming you have a validation schema
 	});
 	useEffect(() => {
 		reset();
@@ -64,18 +68,16 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 		handleClose();
 	};
 	const onSubmit = async (data) => {
-		const { studentNumber, ...newData } = data;
-		const body = { ...newData, studentCode: studentNumber };
 		try {
 			let response; // Declare response outside the if statement
 
 			if (isUpdate) {
-				response = await update({ id: studentId, body }).unwrap();
+				response = await update(data).unwrap();
 			} else {
-				response = await create({ ...newData, password: "123", studentCode: data?.studentNumber }).unwrap();
+				response = await create(data).unwrap();
 			}
 			handleClose();
-			toast.success(response?.result?.message || "Operation successful", { position: "top-center" });
+			toast.success(response?.message || "Operation successful", { position: "top-center" });
 		} catch (error) {
 			// Handle the error appropriately
 			console.error("Error submitting data:", error); // Log the error for debugging

@@ -130,8 +130,11 @@ const MedicineCard = ({
 				}).unwrap(),
 		})
 			.then((res) => {
+
+				console.log("👻 ~ res:", res);
+
 				if (res.isConfirmed) {
-					toast.success(res?.result?.message, { position: "top-center" });
+					toast.success(`${res?.result?.message}`, { position: "top-center" });
 				}
 			})
 			.catch((error) => {
@@ -256,10 +259,10 @@ const MedicineCard = ({
 							zIndex: 2,
 						}}
 					>
-						<Button variant="contained" color="success" onClick={approve}>
+						<Button size="small" variant="contained" color="success" onClick={approve}>
 							Approve
 						</Button>
-						<Button variant="contained" onClick={reject}>
+						<Button  size="small"  variant="contained" onClick={reject}>
 							Reject
 						</Button>
 					</Box>
@@ -439,10 +442,10 @@ const MedicineCard = ({
 							alignSelf: "flex-end",
 						}}
 					>
-						<Button variant="contained" onClick={reject}>
+						<Button  size="small"  variant="contained" onClick={reject}>
 							Reject
 						</Button>
-						<Button variant="contained" color="success" onClick={approve}>
+						<Button size="small" variant="contained" color="success" onClick={approve}>
 							Approve
 						</Button>
 					</Box>

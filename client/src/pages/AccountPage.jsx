@@ -53,16 +53,16 @@ const AccountPage = () => {
 				<Box className="account-page__user-content">
 					<Avatar
 						className="account-page__avatar"
-						{...stringAvatar(isAdmin ? "Admin" : `${userData?.firstName}`)}
+						{...stringAvatar(isAdmin ? userData?.username : `${userData?.firstName}`)}
 						style={{
 							border: "2px solid white",
 						}}
 					/>
 					<Box>
 						<Typography variant="h6" fontWeight={"bold"} color="primary">
-							{isAdmin ? "Admin" : `${userData?.firstName} ${userData?.lastName}`}
+							{isAdmin ? userData?.username : `${userData?.firstName} ${userData?.lastName}`}
 						</Typography>
-						<Typography variant="caption">{userData?.studentCode}</Typography>
+						<Typography variant="caption">{isAdmin ? "Admin" : userData?.studentCode}</Typography>
 					</Box>
 				</Box>
 				<Button
