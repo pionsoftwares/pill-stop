@@ -1,0 +1,99 @@
+$primary-main: #d33333; // Your primary color
+$primary-light: #e46b6b; // Lightened primary (use a specific hex value)
+$primary-dark: #a52b2b; // Darkened primary (use a specific hex value)
+$primary-contrast-text: #ffffff; // White text for contrast
+
+$secondary-main: #4b6584; // Muted slate blue to complement the primary red
+$secondary-light: #6b88a7; // Lightened secondary (use a specific hex value)
+$secondary-dark: #3b4c67; // Darkened secondary (use a specific hex value)
+$secondary-contrast-text: #ffffff;
+
+$tertiary-main: #915c83; // A complementary muted plum for tertiary use
+$tertiary-light: #b38ba1; // Lightened tertiary (use a specific hex value)
+$tertiary-dark: #6d3e59; // Darkened tertiary (use a specific hex value)
+$tertiary-contrast-text: #ffffff;
+
+$info-main: #4cd3c2; // Soft teal for informational highlights
+$info-light: #7ef0ea; // Lightened info (use a specific hex value)
+$info-dark: #2da69d; // Darkened info (use a specific hex value)
+$info-contrast-text: #ffffff;
+
+$warning-main: #f4a261; // Warm orange for warnings, balancing with the red
+$warning-light: #f6b986; // Lightened warning (use a specific hex value)
+$warning-dark: #c87b3f; // Darkened warning (use a specific hex value)
+$warning-contrast-text: #000000;
+
+$error-main: #c23616; // Deep orange-red for errors, still within the red family
+$error-light: #d85f4b; // Lightened error (use a specific hex value)
+$error-dark: #9c2a12; // Darkened error (use a specific hex value)
+$error-contrast-text: #ffffff;
+
+$success-main: #6abf69; // Muted green for success
+$success-light: #8bdc8b; // Lightened success (use a specific hex value)
+$success-dark: #4c9f51; // Darkened success (use a specific hex value)
+$success-contrast-text: #ffffff;
+
+$background-default: #f7f7f7; // White background as specified
+$background-paper: #ffff; // Slightly off-white for paper elements to reduce strain
+$background-header: #f0f0f0; // Light gray for headers
+
+$text-primary: #333333; // Dark gray for primary text, soft on the eyes
+$text-secondary: #555555; // Medium gray for secondary text
+$text-disabled: #999999; // Lighter gray for disabled text
+$text-hint: #bbbbbb; // Even lighter gray for hints
+
+$caution-main: #e5b700; // Muted gold for caution, less intense than a typical yellow
+$caution-light: #e5cb7f; // Lightened caution (use a specific hex value)
+$caution-dark: #c49b00; // Darkened caution (use a specific hex value)
+$caution-contrast-text: #000000; // Dark text for caution readability
+
+:export {
+	primary-main: $primary-main;
+	primary-light: $primary-light;
+	primary-dark: $primary-dark;
+	primary-contrast-text: $primary-contrast-text;
+
+	secondary-main: $secondary-main;
+	secondary-light: $secondary-light;
+	secondary-dark: $secondary-dark;
+	secondary-contrast-text: $secondary-contrast-text;
+
+	info-main: $info-main;
+	info-light: $info-light;
+	info-dark: $info-dark;
+	info-contrast-text: $info-contrast-text;
+
+	warning-main: $warning-main;
+	warning-light: $warning-light;
+	warning-dark: $warning-dark;
+	warning-contrast-text: $warning-contrast-text;
+
+	error-main: $error-main;
+	error-light: $error-light;
+	error-dark: $error-dark;
+	error-contrast-text: $error-contrast-text;
+
+	success-main: $success-main;
+	success-light: $success-light;
+	success-dark: $success-dark;
+	success-contrast-text: $success-contrast-text;
+
+	tertiary-main: $tertiary-main;
+	tertiary-light: $tertiary-light;
+	tertiary-dark: $tertiary-dark;
+	tertiary-contrast-text: $tertiary-contrast-text;
+
+	background-default: $background-default;
+	background-paper: $background-paper;
+	background-header: $background-header;
+
+	text-primary: $text-primary;
+	text-secondary: $text-secondary;
+	text-disabled: $text-disabled;
+	text-hint: $text-hint;
+
+	caution-main: $caution-main;
+	caution-light: $caution-light;
+	caution-dark: $caution-dark;
+	caution-contrast-text: $caution-contrast-text;
+}
