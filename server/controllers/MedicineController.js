@@ -20,11 +20,15 @@ const MedicineController = {
       const medicineRequests = await MedicineRequest.findAll({
         where: {
           status: "Approved",
-          createdAt: {
-            [Sequelize.Op.gte]: dateFrom,
-          },
+          ...(dateFrom && {
+            createdAt: {
+              [Sequelize.Op.gte]: dateFrom,
+            },
+          }),
         },
       });
+
+      console.log(medicineRequests, "A");
 
       const medicineQuantities = medicineRequests.reduce((acc, request) => {
         const { medicineName } = request;
