@@ -1,16 +1,18 @@
+import { Box, Tab, Tabs, Typography } from "@mui/material";
+import { useState } from "react";
 import {
+  FolderRounded,
   PendingRounded,
   ThumbDownRounded,
   ThumbUpRounded,
 } from "@mui/icons-material";
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import MedicineCard from "../components/RequestPage/MedicineCard";
 import appConfig from "../config";
 import {
   useGetAdminRequestQuery,
   useGetStudentRequestQuery,
+  useGetUnfilteredRequestsQuery,
 } from "../features/api/medicineApi";
 import "../styles/HistoryPage.scss";
 import DataStateHandler from "./DataStateHandler";
@@ -24,12 +26,20 @@ const HistoryPage = () => {
   const userData = useSelector((state) => state.auth.user);
   const isAdmin = !userData?.studentCode;
   const handleChange = (event, newValue) => setValue(newValue);
-  const dispatch = useDispatch();
   const {
     data: studentData,
     isLoading: isStudentLoading,
     isFetching: isStudentFetching,
   } = useGetStudentRequestQuery();
+  const {
+    data: unfilteredRequest,
+    isLoading: isUnFilteredRequestLoading,
+    isFetching: isUnfilteredRequestFetching,
+  } = useGetUnfilteredRequestsQuery();
+  const dispatch = useDispatch();
+
+  console.log("👻 ~ unfilteredRequest:", unfilteredRequest);
+
   const {
     data: adminData,
     isLoading: isAdminLoading,
@@ -69,16 +79,61 @@ const HistoryPage = () => {
       label: "Rejected Medicines",
       icon: <ThumbDownRounded style={{ color: "white" }} />,
     },
+    ...(isAdmin
+      ? [
+          {
+            label: "Medicine Request Record",
+            icon: <FolderRounded style={{ color: "white" }} />,
+          },
+        ]
+      : []),
   ];
 
   // Get data based on the selected tab
   const getCurrentRequests = () => {
-    if (value === 0) return data?.medicineRequests?.Approved || [];
-    if (value === 1) return data?.medicineRequests?.Pending || [];
-    if (value === 2) return data?.medicineRequests?.Rejected || [];
+    if (value === 0) {
+      // Approved requests
+      return (
+        data?.medicineRequests?.Approved?.slice().sort(
+          (a, b) =>
+            new Date(b.approval?.approvedAt) - new Date(a.approval?.approvedAt) // Sort by approvedAt descending
+        ) || []
+      );
+    }
+
+    if (value === 1) {
+      // Pending requests
+      return data?.medicineRequests?.Pending || [];
+    }
+
+    if (value === 2) {
+      // Rejected requests
+      return (
+        data?.medicineRequests?.Rejected?.slice().sort(
+          (a, b) =>
+            new Date(b.rejection?.reason || "") -
+            new Date(a.rejection?.reason || "") // Sort by rejection reason or use another criteria if needed
+        ) || []
+      );
+    }
+
+    if (value === 3) {
+      // Combined Approved and Rejected requests
+      const combinedRequests = unfilteredRequest.medicineRequests.filter(
+        (req) => req.status === "Approved" || req.status === "Rejected"
+      );
+
+      return combinedRequests.length > 0
+        ? combinedRequests.slice().sort((a, b) => {
+            const approvedAtA = new Date(a.approval?.approvedAt) || new Date(0); // Fallback to epoch if not present
+            const approvedAtB = new Date(b.approval?.approvedAt) || new Date(0); // Fallback to epoch if not present
+            return approvedAtB - approvedAtA; // Sort approved requests first
+          })
+        : []; // Return an empty array if no requests are present
+    }
+
     return [];
   };
-
   const currentRequests = getCurrentRequests();
   const getMedicineImage = (medicineName) => {
     for (const key in appConfig.medicines) {
@@ -114,19 +169,21 @@ const HistoryPage = () => {
           className="history-page__tabs"
           value={value}
           onChange={handleChange}
-          centered
+          centered={tabs.length <= 4}
+          allowScrollButtonsMobile={tabs.length > 4} // Enable scroll buttons only if more than 4 tabs
+          variant={tabs.length > 4 ? "scrollable" : "fullWidth"} // Scrollable if more than 4 tabs, standard otherwise
+          scrollButtons={tabs.length > 4 ? "auto" : false} // Show scroll buttons if more than 3 tabs
           aria-label="medicine request tabs"
           textColor="inherit"
-          variant="fullWidth"
           TabIndicatorProps={{
             sx: {
               backgroundColor: "background.default",
               position: "absolute",
               zIndex: 1,
               bottom: "-5px",
-              height: "25px",
-              clipPath:
-                "path('M 0 200 L 0,90 A 5,5 0,0,1 150,75 L 200 200 z');", // Single rounded hill shape
+              height: "15px",
+              borderRadius: "100px 100px 0 0", // Half-circle shape on top
+              transform: "translateX(0)", // Remove manual translation, indicator will adjust automatically
             },
           }}
         >
@@ -162,7 +219,7 @@ const HistoryPage = () => {
             })
           ) : (
             <Typography variant="body1" textAlign="center">
-              No {tabs[value].label.toLowerCase()} requests found.
+              No {tabs[value].label.toLowerCase()} found.
             </Typography>
           )}
         </DataStateHandler>

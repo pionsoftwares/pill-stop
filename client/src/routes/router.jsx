@@ -3,12 +3,13 @@ import LoginPage from "../pages/LoginPage";
 
 import appConfig from "../config.jsx";
 import AccountPage from "../pages/AccountPage.jsx";
-import HistoryPage from "../pages/HistoryPage.jsx";
+
 import MainPage from "../pages/MainPage";
 import NotFound from "../pages/NotFound";
 import PrivateRoutes from "../pages/PrivateRoutes";
 import RequestPage from "../pages/RequestPage";
 import UsersPage from "../pages/UsersPage.jsx";
+import HistoryPage from "../pages/HistoryPage.jsx";
 
 export const router = createBrowserRouter([
 	{

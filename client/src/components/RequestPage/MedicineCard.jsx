@@ -38,11 +38,13 @@ const MedicineCard = ({
 	name,
 	image,
 	isRecommended,
+	dispensed,
 	remaining,
 	code,
 	symptoms,
 	currentSymptoms,
 	rejection,
+	date,
 	genericName,
 	requestId,
 	statusLabel,
@@ -131,8 +133,6 @@ const MedicineCard = ({
 				}).unwrap(),
 		})
 			.then((res) => {
-				console.log("👻 ~ res:", res);
-
 				if (res.isConfirmed) {
 					toast.success(`${res?.result?.message}`, { position: "top-center" });
 				}
@@ -181,9 +181,8 @@ const MedicineCard = ({
 					transition: "none", // Remove hover transformation
 				}}
 			>
-				<Suspense fallback={<CircularProgress />}>
-					<img src={image} alt={name} width={100} height={100} style={{ marginRight: "1rem" }} />
-				</Suspense>
+				<img src={image} alt={name} width={100} height={100} style={{ marginRight: "1rem" }} />
+
 				<CardContent sx={{ textAlign: "left", flexGrow: 1 }} onClick={isAdmin ? handleClickOpen : undefined}>
 					<Typography variant="h6" component="div">
 						{name}
@@ -199,11 +198,11 @@ const MedicineCard = ({
 							</Typography> */}
 						</>
 					)}
-					<Box display={"flex"} flexDirection={"column"}>
+					<Box display={"flex"} flexDirection={"column"} gap={0.5}>
 						{((isRecommended && matchingCurrentSymptoms) || statusLabel) && (
 							<Box>
 								<Chip
-									label={statusLabel ?? "Recommended"}
+									label={statusLabel ?? "Suggested"}
 									color={
 										statusLabel === "Approved" || isRecommended
 											? "success"
@@ -214,10 +213,15 @@ const MedicineCard = ({
 									size="small"
 								/>
 							</Box>
-						)}{" "}
+						)}
+						{dispensed && (
+							<Box>
+								<Chip size="small" color="info" label={"Requested: " + dispensed} />
+							</Box>
+						)}
 						{remaining && (
 							<Box>
-								<Chip size="small" color="info" label={"Stocks: " + remaining} />
+								<Chip size="small" color="info" label={"Remaining: " + remaining} />
 							</Box>
 						)}
 						{rejection ? (

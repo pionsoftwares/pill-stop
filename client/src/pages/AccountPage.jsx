@@ -131,11 +131,13 @@ const AccountPage = () => {
 			<ClickAwayListener
 				onClickAway={(event) => {
 					const paperElement = document.querySelector(".account-page__form");
+					const selectElement = document.querySelector(".MuiSelect-root"); // Select element for the date range
 					if (
 						isClickAwayActive &&
 						(isEditAccount || isMedicineList) &&
 						paperElement &&
-						!paperElement.contains(event.target)
+						!paperElement.contains(event.target) &&
+						!selectElement.contains(event.target) // Check if the click is not on the select
 					) {
 						handleCloseEdit();
 						handleCloseMedicineList();
@@ -176,7 +178,7 @@ const AccountPage = () => {
 						/>
 					)}
 				</Box>
-			</ClickAwayListener>{" "}
+			</ClickAwayListener>
 			<Backdrop
 				sx={{ color: "#fff", zIndex: 50 }}
 				open={isEditAccount || isMedicineList}

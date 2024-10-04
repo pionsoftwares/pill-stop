@@ -20,6 +20,13 @@ export const medicineApi = api
         }),
         providesTags: ["MEDICINE"],
       }),
+      getUnfilteredRequests: builder.query({
+        query: () => ({
+          url: `${appConfig.apiEndpoints.requestMedicine}/unfiltered`, // Use centralized endpoint
+          method: "GET",
+        }),
+        providesTags: ["MEDICINE"],
+      }),
       getAdminRequest: builder.query({
         query: () => ({
           url: appConfig.apiEndpoints.requestMedicine, // Use centralized endpoint
@@ -55,13 +62,23 @@ export const medicineApi = api
         }),
         providesTags: ["MEDICINE"],
       }),
+      getDispensedMedicines: builder.query({
+        query: (params) => ({
+          url: `${appConfig.apiEndpoints.medicine}/requests`, // Use centralized endpoint
+          method: "GET",
+          params,
+        }),
+        providesTags: ["MEDICINE"],
+      }),
     }),
   });
 
 export const {
   useRequestMedicineMutation,
+  useGetUnfilteredRequestsQuery,
   useGetNumberMedicinesQuery,
   useApproveRequestMutation,
+  useGetDispensedMedicinesQuery,
   useGetAdminRequestQuery,
   useGetStudentRequestQuery,
   useLazyGetAdminRequestQuery,
