@@ -10,24 +10,33 @@ import ConfirmProvider from "./context/ConfirmContext";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import ReasonProvider from "./context/ReasonContext";
+import { SocketProvider } from "./context/SocketContext";
 
 function App() {
-	return (
-		<Provider store={store}>
-			<Toaster richColors closeButton position="top-center" visibleToasts={1} expand={false} />
-			<Box className="app">
-				<ProvidesTheme>
-					<ReasonProvider>
-						<ConfirmProvider>
-							<LocalizationProvider dateAdapter={AdapterMoment}>
-								<RouterProvider router={router}></RouterProvider>
-							</LocalizationProvider>
-						</ConfirmProvider>
-					</ReasonProvider>
-				</ProvidesTheme>
-			</Box>
-		</Provider>
-	);
+  return (
+    <Provider store={store}>
+      <SocketProvider>
+        <Toaster
+          richColors
+          closeButton
+          position="top-center"
+          visibleToasts={1}
+          expand={false}
+        />
+        <Box className="app">
+          <ProvidesTheme>
+            <ReasonProvider>
+              <ConfirmProvider>
+                <LocalizationProvider dateAdapter={AdapterMoment}>
+                  <RouterProvider router={router}></RouterProvider>
+                </LocalizationProvider>
+              </ConfirmProvider>
+            </ReasonProvider>
+          </ProvidesTheme>
+        </Box>
+      </SocketProvider>
+    </Provider>
+  );
 }
 
 export default App;

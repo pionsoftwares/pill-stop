@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const validateSchema = require("../middlewares/validateSchema");
+const socket = require("../middlewares/socket");
 
 const MedicineRequestController = require("../controllers/MedicineRequestController");
 const { medicineRequestSchemas } = require("../schema");
+
+router.use(socket);
 
 router.post(
   "/medicine-requests",

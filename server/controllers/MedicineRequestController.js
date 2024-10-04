@@ -64,6 +64,13 @@ const MedicineRequestController = {
         symptoms,
       });
 
+      // Emit an event to the admin
+      const io = req.io;
+      io.emit("medicineRequest", {
+        message: "A new medicine request has been made",
+        medicineRequest,
+      });
+
       // Send the response
       res.json({
         message: "Medicine requested successfully",
@@ -106,7 +113,7 @@ const MedicineRequestController = {
               attributes: ["reason"],
             },
           ],
-          order: [["createdAt", "DESC"]],
+          order: [["updatedAt", "DESC"]],
         });
 
         const groupedMedicineRequests = groupBy(medicineRequests, "status");
@@ -141,7 +148,7 @@ const MedicineRequestController = {
               attributes: ["reason"],
             },
           ],
-          order: [["createdAt", "DESC"]],
+          order: [["updatedAt", "DESC"]],
         });
 
         const groupedMedicineRequests = groupBy(medicineRequests, "status");
@@ -204,7 +211,7 @@ const MedicineRequestController = {
             attributes: ["reason"],
           },
         ],
-        order: [["createdAt", "DESC"]],
+        order: [["updatedAt", "DESC"]],
       });
 
       res.json({ medicineRequests });
@@ -280,6 +287,19 @@ const MedicineRequestController = {
       // Commit the transaction
       await transaction.commit();
 
+      // Emit an event to the student
+      const io = req.io;
+      io.emit("medicineRequestApproved", {
+        message: "Your medicine request has been approved",
+        medicineRequest: {
+          medicineRequestId: medicineRequest.id,
+          medicineName: medicineRequest.medicineName,
+          symptoms: medicineRequest.symptoms,
+          medicineCode: generatedCode,
+          approvedAt: approval.createdAt,
+        },
+      });
+
       // Send the response
       res.json({
         message: "Medicine request approved successfully",
@@ -347,6 +367,18 @@ const MedicineRequestController = {
 
       // Commit the transaction
       await transaction.commit();
+
+      // Emit an event to the student
+      const io = req.io;
+      io.emit("medicineRequestRejected", {
+        message: "Your medicine request has been rejected",
+        medicineRequest: {
+          medicineRequestId: medicineRequest.id,
+          medicineName: medicineRequest.medicineName,
+          symptoms: medicineRequest.symptoms,
+          reason: rejection.reason,
+        },
+      });
 
       // Send the response
       res.json({
