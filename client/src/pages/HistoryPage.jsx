@@ -28,9 +28,6 @@ const HistoryPage = () => {
 		isFetching: isUnfilteredRequestFetching,
 	} = useGetUnfilteredRequestsQuery();
 	const { data: adminData, isLoading: isAdminLoading, isFetching: isAdminFetching } = useGetAdminRequestQuery();
-
-	console.log("👻 ~ adminData:", adminData);
-
 	const data = studentData ?? adminData;
 	const isLoading = isAdmin ? isAdminLoading : isStudentLoading;
 	const isFetching = isAdmin ? isAdminFetching : isStudentFetching;
@@ -44,35 +41,32 @@ const HistoryPage = () => {
 
 	// Get data based on the selected tab
 	const getCurrentRequests = () => {
+		// Check which value is selected (e.g., 0: Approved, 1: Pending, 2: Rejected, 3: Combined)
 		if (value === 0) {
-			// Approved requests
+			// Filter for Approved requests
 			return (
-				data?.medicineRequests?.Approved?.slice().sort(
-					(a, b) => new Date(b.approval?.approvedAt) - new Date(a.approval?.approvedAt) // Sort by approvedAt descending
-				) || []
+				unfilteredRequest.medicineRequests
+					.filter((req) => req.status === "Approved")
+					.slice()
+					.sort((a, b) => new Date(b.approval?.approvedAt) - new Date(a.approval?.approvedAt)) || []
 			);
 		}
 
 		if (value === 1) {
-			// Pending requests
-			return data?.medicineRequests?.Pending || [];
+			// Filter for Pending requests
+			return unfilteredRequest.medicineRequests.filter((req) => req.status === "Pending") || [];
 		}
 
 		if (value === 2) {
-			// Rejected requests
-			return (
-				data?.medicineRequests?.Rejected?.slice().sort(
-					(a, b) => new Date(b.rejection?.reason || "") - new Date(a.rejection?.reason || "") // Sort by rejection reason or use another criteria if needed
-				) || []
-			);
+			// Filter for Rejected requests
+			return unfilteredRequest.medicineRequests.filter((req) => req.status === "Rejected") || [];
 		}
 
 		if (value === 3) {
-			// Combined Approved and Rejected requests from unfilteredRequest
-			const approvedRequests = unfilteredRequest?.medicineRequests?.Approved || [];
-			const rejectedRequests = unfilteredRequest?.medicineRequests?.Rejected || [];
-
-			const combinedRequests = [...approvedRequests, ...rejectedRequests];
+			// Combined Approved and Rejected requests
+			const combinedRequests = unfilteredRequest.medicineRequests.filter(
+				(req) => req.status === "Approved" || req.status === "Rejected"
+			);
 
 			return combinedRequests.length > 0
 				? combinedRequests.slice().sort((a, b) => {
@@ -83,8 +77,9 @@ const HistoryPage = () => {
 				: []; // Return an empty array if no requests are present
 		}
 
-		return [];
+		return []; // Default return if no valid value
 	};
+
 	const currentRequests = getCurrentRequests();
 	const getMedicineImage = (medicineName) => {
 		for (const key in appConfig.medicines) {
@@ -142,7 +137,16 @@ const HistoryPage = () => {
 				<Typography variant="h6" align="center" color="primary">
 					{`${tabs[value].label}`}
 				</Typography>
-				<DataStateHandler isLoading={isLoading || isFetching}>
+				<DataStateHandler
+					isLoading={
+						isLoading ||
+						isFetching ||
+						isAdminFetching ||
+						isUnFilteredRequestLoading ||
+						isUnfilteredRequestFetching ||
+						isAdminLoading
+					}
+				>
 					{currentRequests.length > 0 ? (
 						currentRequests.map((request) => {
 							return (
