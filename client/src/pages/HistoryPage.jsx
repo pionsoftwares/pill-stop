@@ -27,6 +27,9 @@ const HistoryPage = () => {
 		isLoading: isUnFilteredRequestLoading,
 		isFetching: isUnfilteredRequestFetching,
 	} = useGetUnfilteredRequestsQuery();
+
+	console.log("👻 ~ unfilteredRequest:", unfilteredRequest);
+
 	const { data: adminData, isLoading: isAdminLoading, isFetching: isAdminFetching } = useGetAdminRequestQuery();
 	const data = studentData ?? adminData;
 	const isLoading = isAdmin ? isAdminLoading : isStudentLoading;
@@ -41,25 +44,27 @@ const HistoryPage = () => {
 
 	// Get data based on the selected tab
 	const getCurrentRequests = () => {
-		// Check which value is selected (e.g., 0: Approved, 1: Pending, 2: Rejected, 3: Combined)
 		if (value === 0) {
-			// Filter for Approved requests
+			// Approved requests
 			return (
-				unfilteredRequest.medicineRequests
-					.filter((req) => req.status === "Approved")
-					.slice()
-					.sort((a, b) => new Date(b.approval?.approvedAt) - new Date(a.approval?.approvedAt)) || []
+				data?.medicineRequests?.Approved?.slice().sort(
+					(a, b) => new Date(b.approval?.approvedAt) - new Date(a.approval?.approvedAt) // Sort by approvedAt descending
+				) || []
 			);
 		}
 
 		if (value === 1) {
-			// Filter for Pending requests
-			return unfilteredRequest.medicineRequests.filter((req) => req.status === "Pending") || [];
+			// Pending requests
+			return data?.medicineRequests?.Pending || [];
 		}
 
 		if (value === 2) {
-			// Filter for Rejected requests
-			return unfilteredRequest.medicineRequests.filter((req) => req.status === "Rejected") || [];
+			// Rejected requests
+			return (
+				data?.medicineRequests?.Rejected?.slice().sort(
+					(a, b) => new Date(b.rejection?.reason || "") - new Date(a.rejection?.reason || "") // Sort by rejection reason or use another criteria if needed
+				) || []
+			);
 		}
 
 		if (value === 3) {
@@ -77,9 +82,8 @@ const HistoryPage = () => {
 				: []; // Return an empty array if no requests are present
 		}
 
-		return []; // Default return if no valid value
+		return [];
 	};
-
 	const currentRequests = getCurrentRequests();
 	const getMedicineImage = (medicineName) => {
 		for (const key in appConfig.medicines) {
@@ -137,16 +141,7 @@ const HistoryPage = () => {
 				<Typography variant="h6" align="center" color="primary">
 					{`${tabs[value].label}`}
 				</Typography>
-				<DataStateHandler
-					isLoading={
-						isLoading ||
-						isFetching ||
-						isAdminFetching ||
-						isUnFilteredRequestLoading ||
-						isUnfilteredRequestFetching ||
-						isAdminLoading
-					}
-				>
+				<DataStateHandler isLoading={isLoading || isFetching}>
 					{currentRequests.length > 0 ? (
 						currentRequests.map((request) => {
 							return (
