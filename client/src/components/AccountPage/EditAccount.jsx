@@ -30,7 +30,7 @@ import { accountSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
 import DataStateHandler from "../../pages/DataStateHandler";
-
+import { useSwipeable } from "react-swipeable";
 const EditAccount = ({ open, onEntered, onExited, close, isUpdate, studentId, isViewOnly }) => {
 	const fieldNames = {
 		username: toCamelCase(appConfig.formFields.username),
@@ -119,13 +119,28 @@ const EditAccount = ({ open, onEntered, onExited, close, isUpdate, studentId, is
 			toast.error(error?.data?.message || "An error occurred", { position: "top-center" }); // Notify the user
 		}
 	};
+	const swipeable = useSwipeable({
+		swipeDuration: 125,
 
+		// onSwiped: (e) => console.log("swiping", e),
+		onSwipedDown: () => {
+			handleExited();
+		},
+	});
 	return (
-		<Slide in={open} direction="up" timeout={300} onEntered={onEntered} onExited={handleExited} unmountOnExit>
+		<Slide
+			in={open}
+			direction="up"
+			timeout={300}
+			onEntered={onEntered}
+			onExited={handleExited}
+			unmountOnExit
+			{...swipeable}
+		>
 			<Paper elevation={4} className="account-page__form">
 				<DataStateHandler isLoading={isLoading || isFetching}>
 					<HorizontalRule
-						onClick={handleClose}
+						onClick={handleExited}
 						sx={{
 							position: "absolute",
 							width: "100%",

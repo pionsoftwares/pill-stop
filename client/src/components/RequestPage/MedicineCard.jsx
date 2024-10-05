@@ -3,7 +3,6 @@ import {
 	AssignmentIndRounded,
 	FaceRounded,
 	HelpOutline,
-	Inventory2Outlined,
 	VisibilityOutlined,
 } from "@mui/icons-material";
 import {

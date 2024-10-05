@@ -16,6 +16,7 @@ import {
 } from "../features/api/medicineApi";
 import "../styles/HistoryPage.scss";
 import DataStateHandler from "./DataStateHandler";
+import { useSwipeable } from "react-swipeable";
 import { api } from "../features/api";
 import useMedicineSocket from "../hooks/useMedicineSocket";
 import { useDispatch } from "react-redux";
@@ -37,9 +38,6 @@ const HistoryPage = () => {
     isFetching: isUnfilteredRequestFetching,
   } = useGetUnfilteredRequestsQuery();
   const dispatch = useDispatch();
-
-  console.log("👻 ~ unfilteredRequest:", unfilteredRequest);
-
   const {
     data: adminData,
     isLoading: isAdminLoading,
@@ -48,23 +46,6 @@ const HistoryPage = () => {
   const data = studentData ?? adminData;
   const isLoading = isAdmin ? isAdminLoading : isStudentLoading;
   const isFetching = isAdmin ? isAdminFetching : isStudentFetching;
-
-  useMedicineSocket((event, data) => {
-    dispatch(api.util.invalidateTags(["MEDICINE"]));
-
-    if (event === "medicineRequestApproved") {
-      toast.success(
-        `Your request for ${data.medicineRequest.medicineName} has been approved.`
-      );
-    }
-
-    if (event === "medicineRequestRejected") {
-      toast.error(
-        `Your request for ${data.medicineRequest.medicineName} has been rejected.`
-      );
-    }
-  });
-
   // Tab labels
   const tabs = [
     {
@@ -89,6 +70,22 @@ const HistoryPage = () => {
       : []),
   ];
 
+  useMedicineSocket((event, data) => {
+    dispatch(api.util.invalidateTags(["MEDICINE"]));
+
+    if (event === "medicineRequestApproved") {
+      toast.success(
+        `Your request for ${data.medicineRequest.medicineName} has been approved.`
+      );
+    }
+
+    if (event === "medicineRequestRejected") {
+      toast.error(
+        `Your request for ${data.medicineRequest.medicineName} has been rejected.`
+      );
+    }
+  });
+
   // Get data based on the selected tab
   const getCurrentRequests = () => {
     if (value === 0) {
@@ -99,37 +96,6 @@ const HistoryPage = () => {
             new Date(b.approval?.approvedAt) - new Date(a.approval?.approvedAt) // Sort by approvedAt descending
         ) || []
       );
-    }
-
-    if (value === 1) {
-      // Pending requests
-      return data?.medicineRequests?.Pending || [];
-    }
-
-    if (value === 2) {
-      // Rejected requests
-      return (
-        data?.medicineRequests?.Rejected?.slice().sort(
-          (a, b) =>
-            new Date(b.rejection?.reason || "") -
-            new Date(a.rejection?.reason || "") // Sort by rejection reason or use another criteria if needed
-        ) || []
-      );
-    }
-
-    if (value === 3) {
-      // Combined Approved and Rejected requests
-      const combinedRequests = unfilteredRequest.medicineRequests.filter(
-        (req) => req.status === "Approved" || req.status === "Rejected"
-      );
-
-      return combinedRequests.length > 0
-        ? combinedRequests.slice().sort((a, b) => {
-            const approvedAtA = new Date(a.approval?.approvedAt) || new Date(0); // Fallback to epoch if not present
-            const approvedAtB = new Date(b.approval?.approvedAt) || new Date(0); // Fallback to epoch if not present
-            return approvedAtB - approvedAtA; // Sort approved requests first
-          })
-        : []; // Return an empty array if no requests are present
     }
 
     return [];
@@ -157,12 +123,20 @@ const HistoryPage = () => {
     }
     return ""; // Return a default image or placeholder if not found
   };
+  const swipeable = useSwipeable({
+    onSwipedLeft: () =>
+      setValue((prev) => (prev < tabs.length - 1 ? prev + 1 : prev)),
+    onSwipedRight: () => setValue((prev) => (prev > 0 ? prev - 1 : prev)),
+    swipeDuration: 250,
+  });
   return (
-    <Box className="history-page">
+    <Box className="history-page" {...swipeable}>
       <Box
         className="history-page__iconbar"
         sx={{
           backgroundColor: (theme) => theme.palette.primary.main,
+          position: "fixed",
+          top: 50,
         }}
       >
         <Tabs
@@ -200,9 +174,19 @@ const HistoryPage = () => {
         <DataStateHandler isLoading={isLoading || isFetching}>
           {currentRequests.length > 0 ? (
             currentRequests.map((request) => {
+              const approvedAtDate = new Date(request.approval?.approvedAt);
+              const currentDate = new Date();
+              const timeDifference = currentDate - approvedAtDate; // Time difference in milliseconds
+
+              const threeMinutesInMs = 3 * 60 * 1000; // 3 minutes in milliseconds
+
               return (
                 <MedicineCard
-                  code={request?.approval?.medicineCode?.code}
+                  code={
+                    timeDifference < threeMinutesInMs
+                      ? request?.approval?.medicineCode?.code
+                      : "------"
+                  }
                   rejection={request?.rejection}
                   key={request.id}
                   requestId={request?.id}
