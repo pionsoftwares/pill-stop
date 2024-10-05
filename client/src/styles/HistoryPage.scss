@@ -1,15 +1,22 @@
 .history-page {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	position: relative;
-	&__iconbar {
-		position: absolute;
-		width: 100%;
-		top: 0;
-	}
-	&__outlet {
-		margin-top: 4rem;
-		padding-bottom: 4rem;
-	}
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+
+  &__iconbar {
+    position: absolute;
+    width: 100%;
+    top: 0;
+
+    &.fade {
+      transition: opacity 0.5s ease;
+      opacity: 0; // Fade out when scrolling
+    }
+  }
+
+  &__outlet {
+    margin-top: 4rem;
+    padding-bottom: 4rem;
+  }
 }

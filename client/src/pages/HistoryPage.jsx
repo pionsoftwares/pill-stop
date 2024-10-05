@@ -21,8 +21,11 @@ import { api } from "../features/api";
 import useMedicineSocket from "../hooks/useMedicineSocket";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
+import useScroll from "../hooks/useScroll";
 
 const HistoryPage = () => {
+  const scrolling = useScroll();
+
   const [value, setValue] = useState(0);
   const userData = useSelector((state) => state.auth.user);
   const isAdmin = !userData?.studentCode;
@@ -98,6 +101,37 @@ const HistoryPage = () => {
       );
     }
 
+    if (value === 1) {
+      // Pending requests
+      return data?.medicineRequests?.Pending || [];
+    }
+
+    if (value === 2) {
+      // Rejected requests
+      return (
+        data?.medicineRequests?.Rejected?.slice().sort(
+          (a, b) =>
+            new Date(b.rejection?.reason || "") -
+            new Date(a.rejection?.reason || "") // Sort by rejection reason or use another criteria if needed
+        ) || []
+      );
+    }
+
+    if (value === 3) {
+      // Combined Approved and Rejected requests
+      const combinedRequests = unfilteredRequest.medicineRequests.filter(
+        (req) => req.status === "Approved" || req.status === "Rejected"
+      );
+
+      return combinedRequests.length > 0
+        ? combinedRequests.slice().sort((a, b) => {
+            const approvedAtA = new Date(a.approval?.approvedAt) || new Date(0); // Fallback to epoch if not present
+            const approvedAtB = new Date(b.approval?.approvedAt) || new Date(0); // Fallback to epoch if not present
+            return approvedAtB - approvedAtA; // Sort approved requests first
+          })
+        : []; // Return an empty array if no requests are present
+    }
+
     return [];
   };
   const currentRequests = getCurrentRequests();
@@ -132,7 +166,7 @@ const HistoryPage = () => {
   return (
     <Box className="history-page" {...swipeable}>
       <Box
-        className="history-page__iconbar"
+        className={`history-page__iconbar ${scrolling ? "fade" : ""}`}
         sx={{
           backgroundColor: (theme) => theme.palette.primary.main,
           position: "fixed",
