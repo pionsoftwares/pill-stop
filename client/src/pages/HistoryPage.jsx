@@ -11,6 +11,7 @@ import {
 } from "../features/api/medicineApi";
 import "../styles/HistoryPage.scss";
 import DataStateHandler from "./DataStateHandler";
+import { useSwipeable } from "react-swipeable";
 
 const HistoryPage = () => {
 	const [value, setValue] = useState(0);
@@ -27,9 +28,6 @@ const HistoryPage = () => {
 		isLoading: isUnFilteredRequestLoading,
 		isFetching: isUnfilteredRequestFetching,
 	} = useGetUnfilteredRequestsQuery();
-
-	console.log("👻 ~ unfilteredRequest:", unfilteredRequest);
-
 	const { data: adminData, isLoading: isAdminLoading, isFetching: isAdminFetching } = useGetAdminRequestQuery();
 	const data = studentData ?? adminData;
 	const isLoading = isAdmin ? isAdminLoading : isStudentLoading;
@@ -101,12 +99,19 @@ const HistoryPage = () => {
 		}
 		return ""; // Return a default image or placeholder if not found
 	};
+	const swipeable = useSwipeable({
+		onSwipedLeft: () => setValue((prev) => (prev < tabs.length - 1 ? prev + 1 : prev)),
+		onSwipedRight: () => setValue((prev) => (prev > 0 ? prev - 1 : prev)),
+		swipeDuration: 250,
+	});
 	return (
-		<Box className="history-page">
+		<Box className="history-page" {...swipeable}>
 			<Box
 				className="history-page__iconbar"
 				sx={{
 					backgroundColor: (theme) => theme.palette.primary.main,
+					position: "fixed",
+					top: 50,
 				}}
 			>
 				<Tabs
@@ -144,9 +149,19 @@ const HistoryPage = () => {
 				<DataStateHandler isLoading={isLoading || isFetching}>
 					{currentRequests.length > 0 ? (
 						currentRequests.map((request) => {
+							const approvedAtDate = new Date(request.approval?.approvedAt);
+							const currentDate = new Date();
+							const timeDifference = currentDate - approvedAtDate; // Time difference in milliseconds
+
+							const threeMinutesInMs = 3 * 60 * 1000; // 3 minutes in milliseconds
+
 							return (
 								<MedicineCard
-									code={request?.approval?.medicineCode?.code}
+									code={
+										timeDifference < threeMinutesInMs
+											? request?.approval?.medicineCode?.code
+											: "------"
+									}
 									rejection={request?.rejection}
 									key={request.id}
 									requestId={request?.id}

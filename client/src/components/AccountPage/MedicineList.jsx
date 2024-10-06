@@ -1,7 +1,8 @@
-import { AccountBoxRounded, HorizontalRule, Inventory2Rounded } from "@mui/icons-material";
-import { Box, FormControl, InputLabel, MenuItem, Paper, Select, Slide, Tab, Tabs, Typography } from "@mui/material";
+import { HorizontalRule } from "@mui/icons-material";
+import { Box, FormControl, InputLabel, MenuItem, Paper, Select, Slide, Typography } from "@mui/material";
 import moment from "moment";
 import React, { useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import appConfig from "../../config";
 import { useGetDispensedMedicinesQuery, useGetNumberMedicinesQuery } from "../../features/api/medicineApi";
 import DataStateHandler from "../../pages/DataStateHandler";
@@ -72,11 +73,24 @@ const MedicineList = ({ open, onEntered, onExited, close, isUpdate, studentId, i
 		onExited();
 		handleClose();
 	};
+	const swipeable = useSwipeable({
+		swipeDuration: 125,
 
-	const handleChange = (event, newValue) => setValue(newValue);
-
+		// onSwiped: (e) => console.log("swiping", e),
+		onSwipedDown: () => {
+			handleExited();
+		},
+	});
 	return (
-		<Slide in={open} direction="up" timeout={300} onEntered={onEntered} onExited={handleExited} unmountOnExit>
+		<Slide
+			in={open}
+			direction="up"
+			timeout={300}
+			onEntered={onEntered}
+			onExited={handleExited}
+			unmountOnExit
+			{...swipeable}
+		>
 			<Paper elevation={4} className="account-page__form">
 				<DataStateHandler isLoading={isFetching || isLoading}>
 					<HorizontalRule

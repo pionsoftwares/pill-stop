@@ -17,7 +17,7 @@ import usePasswordVisibility from "../../hooks/usePasswordVisibility";
 import { loginSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
-import DataStateHandler from "../../pages/DataStateHandler";
+import { useSwipeable } from "react-swipeable";
 
 const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 	const fieldNames = {
@@ -80,9 +80,24 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 			toast.error(error?.data?.message || "An error occurred", { position: "top-center" }); // Notify the user
 		}
 	};
+	const swipeable = useSwipeable({
+		swipeDuration: 125,
 
+		// onSwiped: (e) => console.log("swiping", e),
+		onSwipedDown: () => {
+			handleExited();
+		},
+	});
 	return (
-		<Slide in={open} direction="up" timeout={300} onEntered={onEntered} onExited={handleExited} unmountOnExit>
+		<Slide
+			in={open}
+			direction="up"
+			timeout={300}
+			onEntered={onEntered}
+			onExited={handleExited}
+			unmountOnExit
+			{...swipeable}
+		>
 			<Paper elevation={4} className="account-page__form">
 				<HorizontalRule
 					onClick={handleClose}
