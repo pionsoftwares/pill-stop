@@ -1,26 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-	HorizontalRule,
-	PersonOutline,
-	VisibilityOffOutlined,
-	VisibilityOutlined,
-	VpnKeyOutlined,
-} from "@mui/icons-material";
-import {
-	Box,
-	Button,
-	IconButton,
-	InputAdornment,
-	Paper,
-	Slide,
-	SwipeableDrawer,
-	TextField,
-	Typography,
-} from "@mui/material";
+import { PersonOutline, VisibilityOffOutlined, VisibilityOutlined, VpnKeyOutlined } from "@mui/icons-material";
+import { Box, Button, IconButton, InputAdornment, SwipeableDrawer, TextField, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useSwipeable } from "react-swipeable";
 import { toast } from "sonner";
 import appConfig from "../../config";
 import { useCreateAdminMutation, useUpdateAdminMutation } from "../../features/api/adminApi";
@@ -29,7 +12,7 @@ import { loginSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
 
-const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
+const EditAdmin = ({ open, onEntered, close, isUpdate }) => {
 	const fieldNames = {
 		username: toCamelCase(appConfig.formFields.username),
 		password: toCamelCase(appConfig.formFields.password),
@@ -57,19 +40,15 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 		reset();
 		if (isUpdate && userData?.username) {
 			setValue(fieldNames.username, userData?.username || "");
-			setValue(fieldNames.middleName, userData?.username || "");
 		} else {
 			reset();
 		}
-	}, [onEntered]);
+	}, [open]);
 	const handleClose = () => {
 		reset();
 		close();
 	};
-	const handleExited = () => {
-		onExited();
-		handleClose();
-	};
+
 	const onSubmit = async (data) => {
 		try {
 			let response; // Declare response outside the if statement
