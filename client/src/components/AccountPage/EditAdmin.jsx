@@ -1,12 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-	HorizontalRule,
-	PersonOutline,
-	VisibilityOffOutlined,
-	VisibilityOutlined,
-	VpnKeyOutlined,
-} from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, Paper, Slide, TextField, Typography } from "@mui/material";
+import { PersonOutline, VisibilityOffOutlined, VisibilityOutlined, VpnKeyOutlined } from "@mui/icons-material";
+import { Box, Button, IconButton, InputAdornment, SwipeableDrawer, TextField, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -17,17 +11,13 @@ import usePasswordVisibility from "../../hooks/usePasswordVisibility";
 import { loginSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
-import { useSwipeable } from "react-swipeable";
 
-const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
+const EditAdmin = ({ open, onEntered, close, isUpdate }) => {
 	const fieldNames = {
 		username: toCamelCase(appConfig.formFields.username),
 		password: toCamelCase(appConfig.formFields.password),
 	};
 	const userData = useSelector((state) => state.auth.user);
-
-	console.log("👻 ~ userData:", userData);
-
 	const { visibility, toggleVisibility } = usePasswordVisibility();
 
 	const [create] = useCreateAdminMutation();
@@ -50,19 +40,15 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 		reset();
 		if (isUpdate && userData?.username) {
 			setValue(fieldNames.username, userData?.username || "");
-			setValue(fieldNames.middleName, userData?.username || "");
 		} else {
 			reset();
 		}
-	}, [onEntered]);
+	}, [open]);
 	const handleClose = () => {
 		reset();
 		close();
 	};
-	const handleExited = () => {
-		onExited();
-		handleClose();
-	};
+
 	const onSubmit = async (data) => {
 		try {
 			let response; // Declare response outside the if statement
@@ -80,108 +66,86 @@ const EditAdmin = ({ isAdmin, open, onEntered, onExited, close, isUpdate }) => {
 			toast.error(error?.data?.message || "An error occurred", { position: "top-center" }); // Notify the user
 		}
 	};
-	const swipeable = useSwipeable({
-		swipeDuration: 125,
 
-		// onSwiped: (e) => console.log("swiping", e),
-		onSwipedDown: () => {
-			handleExited();
-		},
-	});
 	return (
-		<Slide
-			in={open}
-			direction="up"
-			timeout={300}
-			onEntered={onEntered}
-			onExited={handleExited}
-			unmountOnExit
-			{...swipeable}
+		<SwipeableDrawer
+			anchor={"bottom"}
+			disableSwipeToOpen
+			open={open}
+			PaperProps={{ sx: { borderRadius: "2rem 2rem 0 0", padding: "1rem 2rem" } }}
+			onClose={close}
 		>
-			<Paper elevation={4} className="account-page__form">
-				<HorizontalRule
-					onClick={handleClose}
-					sx={{
-						position: "absolute",
-						width: "100%",
-						top: "20px",
-						left: "50%",
-						transform: "translate(-50%, -50%)",
-					}}
-				/>
-
-				<Typography variant="h5" color="primary" sx={{ paddingBottom: "1rem", textAlign: "center" }}>
-					{appConfig.captions.accountDetails}
-				</Typography>
-				<Box className="account-page__main-form" sx={{ padding: "16px" }}>
-					<form onSubmit={handleSubmit(onSubmit)} id="submit">
-						{/* Personal Information Section */}
-						<Box className="account-page__personal-info" sx={{ marginBottom: "16px" }}>
-							<Typography variant="h6" color="textSecondary" gutterBottom>
-								Admin Information
-							</Typography>
-							<Box display="flex" flexDirection="column" gap={2}>
-								<TextField
-									size="small"
-									slotProps={{
-										inputLabel: { ...(isUpdate ? { shrink: true } : {}) },
-										input: {
-											startAdornment: (
-												<InputAdornment position="start">
-													<PersonOutline />
-												</InputAdornment>
-											),
-										},
-									}}
-									{...register(fieldNames.username)} // Registering field
-									label={appConfig.formFields.username}
-									fullWidth
-									error={!!errors[fieldNames.username]} // Error handling
-									helperText={errors[fieldNames.username]?.message} // Show error message
-								/>
-								<TextField
-									{...register(fieldNames.password)} // Registering field
-									label={fieldNames.password.toCapitalCase()}
-									type={visibility[fieldNames.password] ? "text" : "password"}
-									error={!!errors[fieldNames.password]}
-									helperText={
-										errors?.[fieldNames.password] ? errors?.[fieldNames.password]?.message : " "
-									}
-									fullWidth
-									size="small"
-									variant="outlined"
-									slotProps={{
-										input: {
-											endAdornment: (
-												<InputAdornment position="start">
-													<IconButton onClick={() => toggleVisibility(fieldNames.password)}>
-														{visibility.password ? (
-															<VisibilityOffOutlined />
-														) : (
-															<VisibilityOutlined />
-														)}
-													</IconButton>
-												</InputAdornment>
-											),
-											startAdornment: (
-												<InputAdornment position="start">
-													<VpnKeyOutlined />
-												</InputAdornment>
-											),
-										},
-									}}
-								/>
-							</Box>
+			<Typography variant="h5" color="primary" sx={{ paddingBottom: "1rem", textAlign: "center" }}>
+				{appConfig.captions.accountDetails}
+			</Typography>
+			<Box className="account-page__main-form" sx={{ padding: "16px" }}>
+				<form onSubmit={handleSubmit(onSubmit)} id="submit">
+					{/* Personal Information Section */}
+					<Box className="account-page__personal-info" sx={{ marginBottom: "16px" }}>
+						<Typography variant="h6" color="textSecondary" gutterBottom>
+							Admin Information
+						</Typography>
+						<Box display="flex" flexDirection="column" gap={2}>
+							<TextField
+								size="small"
+								slotProps={{
+									inputLabel: { ...(isUpdate ? { shrink: true } : {}) },
+									input: {
+										startAdornment: (
+											<InputAdornment position="start">
+												<PersonOutline />
+											</InputAdornment>
+										),
+									},
+								}}
+								{...register(fieldNames.username)} // Registering field
+								label={appConfig.formFields.username}
+								fullWidth
+								error={!!errors[fieldNames.username]} // Error handling
+								helperText={errors[fieldNames.username]?.message} // Show error message
+							/>
+							<TextField
+								{...register(fieldNames.password)} // Registering field
+								label={fieldNames.password.toCapitalCase()}
+								type={visibility[fieldNames.password] ? "text" : "password"}
+								error={!!errors[fieldNames.password]}
+								helperText={
+									errors?.[fieldNames.password] ? errors?.[fieldNames.password]?.message : " "
+								}
+								fullWidth
+								size="small"
+								variant="outlined"
+								slotProps={{
+									input: {
+										endAdornment: (
+											<InputAdornment position="start">
+												<IconButton onClick={() => toggleVisibility(fieldNames.password)}>
+													{visibility.password ? (
+														<VisibilityOffOutlined />
+													) : (
+														<VisibilityOutlined />
+													)}
+												</IconButton>
+											</InputAdornment>
+										),
+										startAdornment: (
+											<InputAdornment position="start">
+												<VpnKeyOutlined />
+											</InputAdornment>
+										),
+									},
+								}}
+							/>
 						</Box>
-					</form>
-					<Box sx={{ margin: 2 }}>
-						<Button fullWidth variant="contained" type="submit" form="submit">
-							Submit
-						</Button>
 					</Box>
+				</form>
+				<Box sx={{ margin: 2 }}>
+					<Button fullWidth variant="contained" type="submit" form="submit">
+						Submit
+					</Button>
 				</Box>
-			</Paper>
-		</Slide>
+			</Box>
+		</SwipeableDrawer>
 	);
 };
 
