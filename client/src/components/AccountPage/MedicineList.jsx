@@ -1,8 +1,7 @@
 import { HorizontalRule } from "@mui/icons-material";
-import { Box, FormControl, InputLabel, MenuItem, Paper, Select, Slide, Typography } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, SwipeableDrawer, Typography } from "@mui/material";
 import moment from "moment";
 import React, { useState } from "react";
-import { useSwipeable } from "react-swipeable";
 import appConfig from "../../config";
 import { useGetDispensedMedicinesQuery, useGetNumberMedicinesQuery } from "../../features/api/medicineApi";
 import DataStateHandler from "../../pages/DataStateHandler";
@@ -69,91 +68,76 @@ const MedicineList = ({ open, onEntered, onExited, close, isUpdate, studentId, i
 	const handleClose = () => {
 		close();
 	};
-	const handleExited = () => {
-		onExited();
-		handleClose();
-	};
-	const swipeable = useSwipeable({
-		swipeDuration: 125,
 
-		// onSwiped: (e) => console.log("swiping", e),
-		onSwipedDown: () => {
-			handleExited();
-		},
-	});
 	return (
-		<Slide
-			in={open}
-			direction="up"
-			timeout={300}
-			onEntered={onEntered}
-			onExited={handleExited}
-			unmountOnExit
-			{...swipeable}
+		<SwipeableDrawer
+			anchor={"bottom"}
+			disableSwipeToOpen
+			open={open}
+			PaperProps={{ sx: { borderRadius: "2rem 2rem 0 0", padding: "1rem 2rem" } }}
+			onClose={close}
 		>
-			<Paper elevation={4} className="account-page__form">
-				<DataStateHandler isLoading={isFetching || isLoading}>
-					<HorizontalRule
-						onClick={handleClose}
-						sx={{
-							position: "absolute",
-							width: "100%",
-							top: "20px",
-							left: "50%",
-							transform: "translate(-50%, -50%)",
-						}}
-					/>
+			<DataStateHandler isLoading={isFetching || isLoading}>
+				<HorizontalRule
+					onClick={handleClose}
+					sx={{
+						position: "absolute",
+						width: "100%",
+						top: "20px",
+						left: "50%",
+						transform: "translate(-50%, -50%)",
+					}}
+				/>
 
-					<Box className="content" sx={{ display: "flex", flexDirection: "column" }}>
-						<FormControl fullWidth sx={{ marginTop: "1rem" }}>
-							<InputLabel id="date-range-label">Select Date Range</InputLabel>
-							<Select
-								labelId="date-range-label"
-								value={selectedRange}
-								label="Select Date Range"
-								onChange={handleRangeChange}
-							>
-								<MenuItem value="">
-									<em>Select a date range</em>
-								</MenuItem>
-								<MenuItem value="last7Days">Last 7 Days</MenuItem>
-								<MenuItem value="last15Days">Last 15 Days</MenuItem>
-								<MenuItem value="last30Days">Last 30 Days</MenuItem>
-							</Select>
-						</FormControl>
-						<Box sx={{ overflowL: "auto", maxHeight: "60vh", overflow: "auto" }}>
-							{sortedMedicines.length > 0 ? (
-								sortedMedicines.map((medicine) => {
-									const requestedQuantity =
-										dispensedData?.requestedMedicineQuantities[medicine.name] || 0;
-									return (
-										<MedicineCard
-											dispensed={`${requestedQuantity}`}
-											key={medicine.name}
-											requestButton={false}
-											remaining={medicine?.quantity}
-											name={medicine.name}
-											image={medicine.image}
-											symptoms={medicine.symptoms}
-											genericName={medicine?.genericName}
-											quantity={medicine.quantity} // Pass the quantity
-											isRecommended={
-												medicine.matchingCount !== 0
-													? medicine.matchingCount === highestMatchingCount
-													: false
-											} // Pass the recommendation status
-											currentSymptoms={selectedSymptoms} // Pass only the matching symptoms
-										/>
-									);
-								})
-							) : (
-								<Typography>No medicines found</Typography>
-							)}
-						</Box>
+				<Box className="content" sx={{ display: "flex", flexDirection: "column" }}>
+					<FormControl fullWidth sx={{ marginTop: "1rem" }}>
+						<InputLabel id="date-range-label">Select Date Range</InputLabel>
+						<Select
+							labelId="date-range-label"
+							value={selectedRange}
+							label="Select Date Range"
+							onChange={handleRangeChange}
+						>
+							<MenuItem value="">
+								<em>Select a date range</em>
+							</MenuItem>
+							<MenuItem value="last7Days">Last 7 Days</MenuItem>
+							<MenuItem value="last15Days">Last 15 Days</MenuItem>
+							<MenuItem value="last30Days">Last 30 Days</MenuItem>
+						</Select>
+					</FormControl>
+					<Box sx={{ overflowL: "auto", maxHeight: "60vh", overflow: "auto" }}>
+						{sortedMedicines.length > 0 ? (
+							sortedMedicines.map((medicine) => {
+								const requestedQuantity =
+									dispensedData?.requestedMedicineQuantities[medicine.name] || 0;
+								return (
+									<MedicineCard
+										dispensed={`${requestedQuantity}`}
+										key={medicine.name}
+										requestButton={false}
+										remaining={medicine?.quantity}
+										name={medicine.name}
+										image={medicine.image}
+										symptoms={medicine.symptoms}
+										genericName={medicine?.genericName}
+										quantity={medicine.quantity} // Pass the quantity
+										isRecommended={
+											medicine.matchingCount !== 0
+												? medicine.matchingCount === highestMatchingCount
+												: false
+										} // Pass the recommendation status
+										currentSymptoms={selectedSymptoms} // Pass only the matching symptoms
+									/>
+								);
+							})
+						) : (
+							<Typography>No medicines found</Typography>
+						)}
 					</Box>
-				</DataStateHandler>
-			</Paper>
-		</Slide>
+				</Box>
+			</DataStateHandler>
+		</SwipeableDrawer>
 	);
 };
 

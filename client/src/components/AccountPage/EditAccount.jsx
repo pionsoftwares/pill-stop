@@ -5,7 +5,6 @@ import {
 	CakeOutlined,
 	EventBusyOutlined,
 	GroupOutlined,
-	HorizontalRule,
 	LocalPhoneOutlined,
 	MedicalInformationOutlined,
 	MedicalInformationRounded,
@@ -14,7 +13,7 @@ import {
 	SourceOutlined,
 	VaccinesOutlined,
 } from "@mui/icons-material";
-import { Backdrop, Box, Button, IconButton, InputAdornment, Paper, Slide, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, SwipeableDrawer, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -26,11 +25,10 @@ import {
 	useGetStudentByIdQuery,
 	useUpdateStudentMutation,
 } from "../../features/api/studentApi";
+import DataStateHandler from "../../pages/DataStateHandler";
 import { accountSchema } from "../../schemas/fields";
 import "../../styles/AccountPage.scss";
 import { toCamelCase } from "../../utils/changeCase";
-import DataStateHandler from "../../pages/DataStateHandler";
-import { useSwipeable } from "react-swipeable";
 const EditAccount = ({ open, onEntered, onExited, close, isUpdate, studentId, isViewOnly }) => {
 	const fieldNames = {
 		username: toCamelCase(appConfig.formFields.username),
@@ -96,10 +94,7 @@ const EditAccount = ({ open, onEntered, onExited, close, isUpdate, studentId, is
 		reset();
 		close();
 	};
-	const handleExited = () => {
-		onExited();
-		handleClose();
-	};
+
 	const onSubmit = async (data) => {
 		const { studentNumber, ...newData } = data;
 		const body = { ...newData, studentCode: studentNumber };
@@ -119,368 +114,337 @@ const EditAccount = ({ open, onEntered, onExited, close, isUpdate, studentId, is
 			toast.error(error?.data?.message || "An error occurred", { position: "top-center" }); // Notify the user
 		}
 	};
-	const swipeable = useSwipeable({
-		swipeDuration: 125,
 
-		// onSwiped: (e) => console.log("swiping", e),
-		onSwipedDown: () => {
-			handleExited();
-		},
-	});
 	return (
-		<Slide
-			in={open}
-			direction="up"
-			timeout={300}
-			onEntered={onEntered}
-			onExited={handleExited}
-			unmountOnExit
-			{...swipeable}
+		<SwipeableDrawer
+			anchor={"bottom"}
+			disableSwipeToOpen
+			open={open}
+			PaperProps={{ sx: { borderRadius: "2rem 2rem 0 0", padding: "1rem 2rem" } }}
+			onClose={close}
 		>
-			<Paper elevation={4} className="account-page__form">
-				<DataStateHandler isLoading={isLoading || isFetching}>
-					<HorizontalRule
-						onClick={handleExited}
-						sx={{
-							position: "absolute",
-							width: "100%",
-							top: "20px",
-							left: "50%",
-							transform: "translate(-50%, -50%)",
-						}}
-					/>
+			{/* <Paper elevation={4} className="account-page__form"> */}
+			<DataStateHandler isLoading={isLoading || isFetching}>
+				<Typography variant="h5" color="primary" sx={{ paddingBottom: "1rem", textAlign: "center" }}>
+					{appConfig.captions.accountDetails}
+				</Typography>
+				<Box className="account-page__main-form" sx={{ padding: "16px" }}>
+					<form onSubmit={handleSubmit(onSubmit)} id="submit">
+						{/* Personal Information Section */}
+						<Box className="account-page__personal-info" sx={{ marginBottom: "16px" }}>
+							<Typography
+								variant="h6"
+								color="textSecondary"
+								gutterBottom
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<PersonRounded /> {appConfig.formSections.personalInfo}
+							</Typography>
 
-					<Typography variant="h5" color="primary" sx={{ paddingBottom: "1rem", textAlign: "center" }}>
-						{appConfig.captions.accountDetails}
-					</Typography>
-					<Box className="account-page__main-form" sx={{ padding: "16px" }}>
-						<form onSubmit={handleSubmit(onSubmit)} id="submit">
-							{/* Personal Information Section */}
-							<Box className="account-page__personal-info" sx={{ marginBottom: "16px" }}>
-								<Typography
-									variant="h6"
-									color="textSecondary"
-									gutterBottom
-									display={"flex"}
-									alignItems={"center"}
-									gap={1}
-								>
-									<PersonRounded /> {appConfig.formSections.personalInfo}
-								</Typography>
+							<Box display="flex" flexDirection="column" gap={2}>
+								<TextField
+									size="small"
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.firstName)} // Registering field
+									label={appConfig.formFields.firstName}
+									fullWidth
+									disabled={isUpdate || isViewOnly}
+									error={!!errors[fieldNames.firstName]} // Error handling
+									helperText={errors[fieldNames.firstName]?.message} // Show error message
+								/>
+								<TextField
+									size="small"
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.lastName)} // Registering field
+									label={appConfig.formFields.lastName}
+									fullWidth
+									disabled={isUpdate || isViewOnly}
+									error={!!errors[fieldNames.lastName]}
+									helperText={errors[fieldNames.lastName]?.message}
+								/>
+								<TextField
+									size="small"
+									slotProps={{
+										inputLabel: {
+											...(isUpdate || isViewOnly ? { shrink: true } : {}),
+										},
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.middleName)} // Registering field
+									label={appConfig.formFields.middleName}
+									fullWidth
+									disabled={isUpdate || isViewOnly}
+									error={!!errors[fieldNames.middleName]}
+									helperText={errors[fieldNames.middleName]?.message}
+								/>{" "}
+								<Controller
+									name={fieldNames.birthdate}
+									control={control}
+									render={({ field: { onChange, value } }) => (
+										<DatePicker
+											{...value}
+											disabled={isUpdate || isViewOnly}
+											disableFuture
+											open={openDatepicker}
+											onClose={() => setOpenDatepicker(false)}
+											label={"Birthday"}
+											format="MM/DD/YYYY"
+											value={value ? moment(value) : null}
+											control={control}
+											onChange={(event) => {
+												onChange(moment(event).format("MM/DD/YYYY"));
+											}}
+											fullWidth
+											slotProps={{
+												textField: {
+													"data-tour": "step-23",
+													onClick: () => {
+														isUpdate || isViewOnly ? null : setOpenDatepicker(true);
+													},
+													color: "primary",
 
-								<Box display="flex" flexDirection="column" gap={2}>
-									<TextField
-										size="small"
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<PersonOutline />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.firstName)} // Registering field
-										label={appConfig.formFields.firstName}
-										fullWidth
-										disabled={isUpdate || isViewOnly}
-										error={!!errors[fieldNames.firstName]} // Error handling
-										helperText={errors[fieldNames.firstName]?.message} // Show error message
-									/>
-									<TextField
-										size="small"
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<PersonOutline />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.lastName)} // Registering field
-										label={appConfig.formFields.lastName}
-										fullWidth
-										disabled={isUpdate || isViewOnly}
-										error={!!errors[fieldNames.lastName]}
-										helperText={errors[fieldNames.lastName]?.message}
-									/>
-									<TextField
-										size="small"
-										slotProps={{
-											inputLabel: {
-												...(isUpdate || isViewOnly ? { shrink: true } : {}),
-											},
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<PersonOutline />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.middleName)} // Registering field
-										label={appConfig.formFields.middleName}
-										fullWidth
-										disabled={isUpdate || isViewOnly}
-										error={!!errors[fieldNames.middleName]}
-										helperText={errors[fieldNames.middleName]?.message}
-									/>{" "}
-									<Controller
-										name={fieldNames.birthdate}
-										control={control}
-										render={({ field: { onChange, value } }) => (
-											<DatePicker
-												{...value}
-												disabled={isUpdate || isViewOnly}
-												disableFuture
-												open={openDatepicker}
-												onClose={() => setOpenDatepicker(false)}
-												label={"Birthday"}
-												format="MM/DD/YYYY"
-												value={value ? moment(value) : null}
-												control={control}
-												onChange={(event) => {
-													onChange(moment(event).format("MM/DD/YYYY"));
-												}}
-												fullWidth
-												slotProps={{
-													textField: {
-														"data-tour": "step-23",
-														onClick: () => {
-															isUpdate || isViewOnly ? null : setOpenDatepicker(true);
-														},
-														color: "primary",
-
-														fullWidth: true,
-														size: "small",
-														error: !!errors[fieldNames.birthdate],
-														helperText: errors[fieldNames.birthdate]?.message,
-														slotProps: {
-															inputLabel: {
-																...(isUpdate || isViewOnly ? { shrink: true } : {}),
-															},
-														},
-
-														InputProps: {
-															startAdornment: (
-																<InputAdornment position="start">
-																	<CakeOutlined />
-																</InputAdornment>
-															),
-															endAdornment: (
-																<InputAdornment position="end">
-																	<IconButton
-																		tabIndex={-1}
-																		onClick={() =>
-																			isUpdate || isViewOnly
-																				? null
-																				: setOpenDatepicker(true)
-																		}
-																	>
-																		<EventBusyOutlined />
-																	</IconButton>
-																</InputAdornment>
-															),
+													fullWidth: true,
+													size: "small",
+													error: !!errors[fieldNames.birthdate],
+													helperText: errors[fieldNames.birthdate]?.message,
+													slotProps: {
+														inputLabel: {
+															...(isUpdate || isViewOnly ? { shrink: true } : {}),
 														},
 													},
-												}}
-											/>
-										)}
-									/>
-									{/* <TextField
+
+													InputProps: {
+														startAdornment: (
+															<InputAdornment position="start">
+																<CakeOutlined />
+															</InputAdornment>
+														),
+														endAdornment: (
+															<InputAdornment position="end">
+																<IconButton
+																	tabIndex={-1}
+																	onClick={() =>
+																		isUpdate || isViewOnly
+																			? null
+																			: setOpenDatepicker(true)
+																	}
+																>
+																	<EventBusyOutlined />
+																</IconButton>
+															</InputAdornment>
+														),
+													},
+												},
+											}}
+										/>
+									)}
+								/>
+							</Box>
+						</Box>
+
+						{/* Academic Information Section */}
+						<Box className="account-page__academic-info" sx={{ marginBottom: "16px" }}>
+							<Typography
+								variant="h6"
+								color="textSecondary"
+								gutterBottom
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<AccountBalanceRounded />
+								{appConfig.formSections.academicInfo}
+							</Typography>
+							<Box display="flex" flexDirection="column" gap={2}>
+								<TextField
 									size="small"
-									slotProps={{ inputLabel: {   ...((isUpdate||isViewOnly) ? { shrink: true } : {}) } }}
-									{...register(fieldNames.birthdate)}
-									label={appConfig.formFields.birthdate}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<SourceOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.studentNumber)}
+									label={appConfig.formFields.studentNumber}
+									disabled={isUpdate || isViewOnly}
 									fullWidth
-									disabled={(isUpdate||isViewOnly)}
-									error={!!errors[fieldNames.birthdate]}
-									helperText={errors[fieldNames.birthdate]?.message}
-								/> */}
-								</Box>
+									error={!!errors[fieldNames.studentNumber]}
+									helperText={errors[fieldNames.studentNumber]?.message}
+								/>
+								<TextField
+									size="small"
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<AccountBalanceOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.department)}
+									label={appConfig.formFields.department}
+									fullWidth
+									disabled={isUpdate || isViewOnly}
+									error={!!errors[fieldNames.department]}
+									helperText={errors[fieldNames.department]?.message}
+								/>
 							</Box>
+						</Box>
 
-							{/* Academic Information Section */}
-							<Box className="account-page__academic-info" sx={{ marginBottom: "16px" }}>
-								<Typography
-									variant="h6"
-									color="textSecondary"
-									gutterBottom
-									display={"flex"}
-									alignItems={"center"}
-									gap={1}
-								>
-									<AccountBalanceRounded />
-									{appConfig.formSections.academicInfo}
-								</Typography>
-								<Box display="flex" flexDirection="column" gap={2}>
-									<TextField
-										size="small"
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<SourceOutlined />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.studentNumber)}
-										label={appConfig.formFields.studentNumber}
-										disabled={isUpdate || isViewOnly}
-										fullWidth
-										error={!!errors[fieldNames.studentNumber]}
-										helperText={errors[fieldNames.studentNumber]?.message}
-									/>
-									<TextField
-										size="small"
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<AccountBalanceOutlined />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.department)}
-										label={appConfig.formFields.department}
-										fullWidth
-										disabled={isUpdate || isViewOnly}
-										error={!!errors[fieldNames.department]}
-										helperText={errors[fieldNames.department]?.message}
-									/>
-								</Box>
+						{/* Medical Information Section */}
+						<Box className="account-page__medical-info" sx={{ marginBottom: "16px" }}>
+							<Typography
+								variant="h6"
+								color="textSecondary"
+								gutterBottom
+								display={"flex"}
+								alignItems={"center"}
+								gap={1}
+							>
+								<MedicalInformationRounded />
+								{appConfig.formSections.medicalInfo}
+							</Typography>
+							<Box display="flex" flexDirection="column" gap={2}>
+								<TextField
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<MedicalInformationOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.medicalHistory)}
+									size="small"
+									label={appConfig.formFields.medicalHistory}
+									fullWidth
+									error={!!errors[fieldNames.medicalHistory]}
+									helperText={errors[fieldNames.medicalHistory]?.message}
+								/>
+								<TextField
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<VaccinesOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.allergies)}
+									size="small"
+									label={appConfig.formFields.allergies}
+									fullWidth
+									error={!!errors[fieldNames.allergies]}
+									helperText={errors[fieldNames.allergies]?.message}
+								/>
+								<TextField
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<PersonOutline />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.emergencyContact)}
+									size="small"
+									label={appConfig.formFields.emergencyContact}
+									fullWidth
+									error={!!errors[fieldNames.emergencyContact]}
+									helperText={errors[fieldNames.emergencyContact]?.message}
+								/>
+								<TextField
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<GroupOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.relationship)}
+									size="small"
+									label={appConfig.formFields.relationship}
+									fullWidth
+									error={!!errors[fieldNames.relationship]}
+									helperText={errors[fieldNames.relationship]?.message}
+								/>
+								<TextField
+									disabled={isViewOnly}
+									slotProps={{
+										inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
+										input: {
+											startAdornment: (
+												<InputAdornment position="start">
+													<LocalPhoneOutlined />
+												</InputAdornment>
+											),
+										},
+									}}
+									{...register(fieldNames.contactNumber)}
+									size="small"
+									label={appConfig.formFields.contactNumber}
+									fullWidth
+									error={!!errors[fieldNames.contactNumber]}
+									helperText={errors[fieldNames.contactNumber]?.message}
+								/>
 							</Box>
-
-							{/* Medical Information Section */}
-							<Box className="account-page__medical-info" sx={{ marginBottom: "16px" }}>
-								<Typography
-									variant="h6"
-									color="textSecondary"
-									gutterBottom
-									display={"flex"}
-									alignItems={"center"}
-									gap={1}
-								>
-									<MedicalInformationRounded />
-									{appConfig.formSections.medicalInfo}
-								</Typography>
-								<Box display="flex" flexDirection="column" gap={2}>
-									<TextField
-										disabled={isViewOnly}
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<MedicalInformationOutlined />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.medicalHistory)}
-										size="small"
-										label={appConfig.formFields.medicalHistory}
-										fullWidth
-										error={!!errors[fieldNames.medicalHistory]}
-										helperText={errors[fieldNames.medicalHistory]?.message}
-									/>
-									<TextField
-										disabled={isViewOnly}
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<VaccinesOutlined />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.allergies)}
-										size="small"
-										label={appConfig.formFields.allergies}
-										fullWidth
-										error={!!errors[fieldNames.allergies]}
-										helperText={errors[fieldNames.allergies]?.message}
-									/>
-									<TextField
-										disabled={isViewOnly}
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<PersonOutline />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.emergencyContact)}
-										size="small"
-										label={appConfig.formFields.emergencyContact}
-										fullWidth
-										error={!!errors[fieldNames.emergencyContact]}
-										helperText={errors[fieldNames.emergencyContact]?.message}
-									/>
-									<TextField
-										disabled={isViewOnly}
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<GroupOutlined />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.relationship)}
-										size="small"
-										label={appConfig.formFields.relationship}
-										fullWidth
-										error={!!errors[fieldNames.relationship]}
-										helperText={errors[fieldNames.relationship]?.message}
-									/>
-									<TextField
-										disabled={isViewOnly}
-										slotProps={{
-											inputLabel: { ...(isUpdate || isViewOnly ? { shrink: true } : {}) },
-											input: {
-												startAdornment: (
-													<InputAdornment position="start">
-														<LocalPhoneOutlined />
-													</InputAdornment>
-												),
-											},
-										}}
-										{...register(fieldNames.contactNumber)}
-										size="small"
-										label={appConfig.formFields.contactNumber}
-										fullWidth
-										error={!!errors[fieldNames.contactNumber]}
-										helperText={errors[fieldNames.contactNumber]?.message}
-									/>
-								</Box>
-							</Box>
-						</form>
-						{!isViewOnly && (
-							<Box sx={{ margin: 2 }}>
-								<Button fullWidth variant="contained" type="submit" form="submit" disabled={!isDirty}>
-									Submit
-								</Button>
-							</Box>
-						)}
-					</Box>
-				</DataStateHandler>
-			</Paper>
-		</Slide>
+						</Box>
+					</form>
+					{!isViewOnly && (
+						<Box sx={{ margin: 2 }}>
+							<Button fullWidth variant="contained" type="submit" form="submit" disabled={!isDirty}>
+								Submit
+							</Button>
+						</Box>
+					)}
+				</Box>
+			</DataStateHandler>
+		</SwipeableDrawer>
 	);
 };
 

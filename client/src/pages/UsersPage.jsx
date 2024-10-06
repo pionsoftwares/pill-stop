@@ -12,7 +12,7 @@ const UsersPage = () => {
 	const [isEditAccount, setIsEditAccount] = useState(false);
 	const [isUpdate, setIsUpdate] = useState(false);
 	const [studentId, setStudentId] = useState();
-	const [isClickAwayActive, setIsClickAwayActive] = useState(false);
+
 	const userData = useSelector((state) => state.auth.user);
 
 	const handleOpenEdit = () => {
@@ -21,7 +21,6 @@ const UsersPage = () => {
 
 	const handleCloseEdit = () => {
 		setIsEditAccount(false);
-		setIsClickAwayActive(false);
 	};
 	return (
 		<Box sx={{ width: "100%", padding: "1rem" }}>
@@ -57,34 +56,14 @@ const UsersPage = () => {
 						);
 					})}
 				</DataStateHandler>
-			</Box>{" "}
-			<ClickAwayListener
-				onClickAway={(event) => {
-					const paperElement = document.querySelector(".account-page__form");
-					if (isClickAwayActive && isEditAccount && paperElement && !paperElement.contains(event.target)) {
-						handleCloseEdit();
-					}
-				}}
-			>
-				<Box>
-					<EditAccount
-						open={isEditAccount}
-						close={handleCloseEdit}
-						isUpdate={isUpdate}
-						direction="up"
-						studentId={isUpdate ? studentId : null}
-						timeout={300}
-						onEntered={() => setIsClickAwayActive(true)}
-						onExited={() => setIsClickAwayActive(false)}
-					/>
-				</Box>
-			</ClickAwayListener>
-			<Backdrop
-				sx={{ color: "#fff", zIndex: 50 }}
+			</Box>
+
+			<EditAccount
 				open={isEditAccount}
-				onClick={() => {
-					handleCloseEdit();
-				}}
+				close={handleCloseEdit}
+				isUpdate={isUpdate}
+				studentId={isUpdate ? studentId : null}
+				timeout={300}
 			/>
 		</Box>
 	);
