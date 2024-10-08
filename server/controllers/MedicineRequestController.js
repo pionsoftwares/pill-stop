@@ -272,7 +272,8 @@ const MedicineRequestController = {
       );
 
       const generatedCode = await MedicineService.generateMedicineCode(
-        medicineRequest.medicineName
+        medicineRequest.medicineName,
+        transaction
       );
 
       // Create a medicine code
