@@ -197,7 +197,7 @@ const HistoryPage = () => {
 
 							return (
 								<MedicineCard
-									code={medicineCode}
+									code={tabs[value].label === "Approved Medicines" && medicineCode}
 									rejection={request?.rejection}
 									key={request.id}
 									requestId={request?.id}
