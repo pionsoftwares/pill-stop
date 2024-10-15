@@ -75,11 +75,12 @@ const MedicineService = {
     }
 
     while (!isUnique && attempts < maxAttempts) {
-      // Generate a random 6-digit code
-      let repeatingCharCount = 0;
-      while (repeatingCharCount < 2) {
-        code = Math.floor(100000 + Math.random() * 900000).toString();
-        repeatingCharCount = code.split(currentRepeatChar).length - 1;
+      // Generate a random 6-digit code with exactly two repeating currentRepeatChar
+      code = generateCodeWithTwoRepeats(currentRepeatChar);
+
+      // Ensure no other digits repeat
+      if (hasOtherRepeats(code, currentRepeatChar)) {
+        continue; // Skip this code and try again
       }
 
       // Check if the generated code is unique
@@ -95,6 +96,52 @@ const MedicineService = {
 
     return code;
   },
+};
+
+// Helpers
+// Helper function to generate a code with exactly two repeating characters
+const generateCodeWithTwoRepeats = (repeatingChar) => {
+  let code = "";
+
+  // Ensure exactly two occurrences of the repeatingChar
+  const positions = [];
+  while (positions.length < 2) {
+    const pos = Math.floor(Math.random() * 6);
+    if (!positions.includes(pos)) {
+      positions.push(pos);
+    }
+  }
+
+  // Generate the random code, inserting the repeatingChar at the chosen positions
+  for (let i = 0; i < 6; i++) {
+    if (positions.includes(i)) {
+      code += repeatingChar;
+    } else {
+      let randomDigit;
+      do {
+        randomDigit = Math.floor(Math.random() * 10).toString();
+      } while (randomDigit === repeatingChar);
+      code += randomDigit;
+    }
+  }
+
+  return code;
+};
+
+// Helper function to check if there are any repeating digits other than repeatingChar
+const hasOtherRepeats = (code, repeatingChar) => {
+  const digitCounts = {};
+
+  for (let digit of code) {
+    if (digit !== repeatingChar) {
+      digitCounts[digit] = (digitCounts[digit] || 0) + 1;
+      if (digitCounts[digit] > 1) {
+        return true; // Found another digit repeating
+      }
+    }
+  }
+
+  return false;
 };
 
 module.exports = MedicineService;
